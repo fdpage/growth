@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alat Keuangan</title>
+  <style>
+    body {
+      background-color: #001a00;
+      color: #ccffcc;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    h1 {
+      color: #00ff99;
+      margin-bottom: 1rem;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .btn {
+      background-color: #003300;
+      border: 1px solid #00cc66;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1rem;
+      color: #ccffcc;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #004d1a;
+      transform: translateY(-3px);
+    }
+
+    a.back {
+      display: inline-block;
+      margin-top: 2rem;
+      color: #00cc66;
+      text-decoration: none;
+    }
+
+    a.back:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>💰 Alat Keuangan</h1>
+  <p>Silakan pilih salah satu alat berikut:</p>
+
+  <div class="button-group">
+    <a href="money-management.html" class="btn">📊 Kalkulator Money Management</a>
+    <a href="latihan-trading.html" class="btn">📓 Latihan Trading</a>
+    <a href="jurnal-trading.html" class="btn">📈 Jurnal Trading</a>
+  </div>
+
+  <a href="index.html" class="back">← Kembali ke Dashboard</a>
+</body>
+</html>

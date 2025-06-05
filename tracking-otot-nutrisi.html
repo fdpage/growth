@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tracking Otot & Nutrisi</title>
+  <style>
+    body {
+      background-color: #081b12;
+      color: #d6ffe7;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    h1, h2 {
+      color: #00ff99;
+    }
+
+    label, input, textarea, select {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 12px;
+      border-radius: 6px;
+      background: #0f2a1f;
+      color: #fff;
+      border: 1px solid #1f4c3a;
+    }
+
+    button {
+      background-color: #00cc66;
+      color: #000;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #00e676;
+    }
+
+    .danger {
+      background-color: #cc0000;
+      color: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background-color: #0f2a1f;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #1f4c3a;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #00ff99;
+      color: #000;
+    }
+
+    tr:nth-child(even) {
+      background-color: #123526;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #194633;
+    }
+
+    .top-buttons, .bottom-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .bottom-buttons {
+      margin-top: 40px;
+      justify-content: center;
+    }
+
+    .btn-back {
+      background-color: #007f4f;
+      color: #fff;
+    }
+
+    .btn-back:hover {
+      background-color: #00b36b;
+    }
+
+    #panduanSuplemen {
+      background-color: #0f2a1f;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      border: 1px solid #1f4c3a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-buttons">
+    <button class="danger" onclick="hapusSemuaData()">🗑️ Hapus Semua Data</button>
+  </div>
+
+  <h1>📈 Tracking Progress Otot</h1>
+
+  <label for="tanggal">Tanggal:</label>
+  <input type="date" id="tanggal" />
+
+  <label for="berat">Berat Badan (kg):</label>
+  <input type="number" id="berat" step="0.1" />
+
+  <label for="otot">Lingkar Otot (cm):</label>
+  <input type="number" id="otot" step="0.1" />
+
+  <label for="latihan">Latihan Hari Ini:</label>
+  <textarea id="latihan" rows="3" placeholder="Contoh: Push, Pull, Legs..."></textarea>
+
+  <button onclick="simpanTracking()">💾 Simpan Progress</button>
+
+  <table id="tabelTracking" style="display:none">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Berat (kg)</th>
+        <th>Lingkar Otot (cm)</th>
+        <th>Latihan</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>🍽️ Panduan Nutrisi & Suplemen</h2>
+  <label for="tujuan">Tujuan:</label>
+  <select id="tujuan">
+    <option value="bulking">Bulking (naikkan massa otot)</option>
+    <option value="cutting">Cutting (defisit lemak)</option>
+    <option value="maintenance">Maintenance</option>
+  </select>
+
+  <button onclick="tampilkanPanduan()">📘 Lihat Panduan</button>
+
+  <div id="panduanSuplemen"></div>
+
+  <div class="bottom-buttons">
+    <button class="btn-back" onclick="window.history.back()">🏋 Kembali ke Kebugaran</button>
+  </div>
+
+  <script>
+    const keyTracking = "progresOtot";
+
+    function ambilTracking() {
+      return JSON.parse(localStorage.getItem(keyTracking)) || [];
+    }
+
+    function simpanTracking() {
+      const tanggal = document.getElementById("tanggal").value;
+      const berat = document.getElementById("berat").value;
+      const otot = document.getElementById("otot").value;
+      const latihan = document.getElementById("latihan").value;
+
+      if (!tanggal || !berat || !otot) {
+        alert("Isi semua data terlebih dahulu!");
+        return;
+      }
+
+      const data = ambilTracking();
+      data.push({ tanggal, berat, otot, latihan });
+      localStorage.setItem(keyTracking, JSON.stringify(data));
+
+      tampilkanTracking();
+      document.getElementById("tanggal").value = '';
+      document.getElementById("berat").value = '';
+      document.getElementById("otot").value = '';
+      document.getElementById("latihan").value = '';
+    }
+
+    function tampilkanTracking() {
+      const data = ambilTracking();
+      const tbody = document.querySelector("#tabelTracking tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(d => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${d.tanggal}</td>
+            <td>${d.berat}</td>
+            <td>${d.otot}</td>
+            <td>${d.latihan}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById("tabelTracking").style.display = data.length > 0 ? "table" : "none";
+    }
+
+    function tampilkanPanduan() {
+      const tujuan = document.getElementById("tujuan").value;
+      const panduan = {
+        bulking: `
+          <strong>Kalori:</strong> 300–500 kalori surplus dari kebutuhan harian.<br/>
+          <strong>Protein:</strong> 2g per kg berat badan.<br/>
+          <strong>Karbohidrat:</strong> Tinggi (nasi, oatmeal, kentang).<br/>
+          <strong>Suplemen:</strong> Whey protein, creatine, mass gainer, fish oil.
+        `,
+        cutting: `
+          <strong>Kalori:</strong> 300–500 kalori defisit dari kebutuhan harian.<br/>
+          <strong>Protein:</strong> 2.2g per kg berat badan.<br/>
+          <strong>Karbohidrat:</strong> Rendah/sedang (hindari gula tinggi).<br/>
+          <strong>Suplemen:</strong> Whey isolate, BCAA, green tea extract, L-carnitine.
+        `,
+        maintenance: `
+          <strong>Kalori:</strong> Sesuai kebutuhan harian (maintenance calories).<br/>
+          <strong>Protein:</strong> 1.6–2g per kg berat badan.<br/>
+          <strong>Karbohidrat:</strong> Seimbang (pilih karbo kompleks).<br/>
+          <strong>Suplemen:</strong> Multivitamin, omega-3, creatine.
+        `
+      };
+
+      document.getElementById("panduanSuplemen").innerHTML = panduan[tujuan];
+    }
+
+    function hapusSemuaData() {
+      if (confirm("Apakah kamu yakin ingin menghapus semua data tracking?")) {
+        localStorage.removeItem(keyTracking);
+        tampilkanTracking();
+      }
+    }
+
+    // Load data saat halaman dibuka
+    window.onload = tampilkanTracking;
+  </script>
+
+</body>
+</html>

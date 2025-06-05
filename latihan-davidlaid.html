@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tracker Latihan Otot - David Laid Style</title>
+  <style>
+    body {
+      background-color: #0b1f0f;
+      color: #e6ffe6;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    h1 {
+      color: #00ff99;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      background-color: #102a14;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 8px rgba(0, 255, 128, 0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #00cc66;
+      color: #000;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #13351a;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #1a4726;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    .btn {
+      background-color: #00994d;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      background-color: #00cc66;
+      transform: translateY(-2px);
+    }
+
+    .nav-links {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      color: #00ff99;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .nav-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tracker Latihan Otot (David Laid Style)<br>1 Bulan Program</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Hari ke-</th>
+        <th>Rencana Latihan</th>
+        <th>Selesai ✅</th>
+      </tr>
+    </thead>
+    <tbody id="tracker-body"></tbody>
+  </table>
+
+  <div style="text-align: center;">
+    <button class="btn" onclick="resetProgress()">🔄 Reset Semua Ceklis</button>
+  </div>
+
+  <div class="nav-links">
+    <a href="kebugaran.html" class="nav-link">← Kembali ke Kebugaran</a>
+  </div>
+
+  <script>
+    const planPerWeek = [
+      "Push (Chest, Shoulder, Triceps)",
+      "Pull (Back, Biceps)",
+      "Leg Day (Quads, Hamstring, Calves)",
+      "Core + Cardio",
+      "Push (Chest, Shoulder, Triceps)",
+      "Pull (Back, Biceps)",
+      "Rest"
+    ];
+
+    const totalDays = 28;
+
+    function loadTracker() {
+      const tbody = document.getElementById("tracker-body");
+      tbody.innerHTML = "";
+
+      for (let i = 1; i <= totalDays; i++) {
+        const plan = planPerWeek[(i - 1) % 7];
+        const id = `hari${i}`;
+        const checked = localStorage.getItem(id) === "true" ? "checked" : "";
+
+        tbody.innerHTML += `
+          <tr>
+            <td>Hari ${i}</td>
+            <td>${plan}</td>
+            <td><input type="checkbox" id="${id}" onchange="updateCeklis('${id}')" ${checked}></td>
+          </tr>
+        `;
+      }
+    }
+
+    function updateCeklis(id) {
+      const checkbox = document.getElementById(id);
+      localStorage.setItem(id, checkbox.checked);
+    }
+
+    function resetProgress() {
+      if (confirm("Yakin ingin reset semua progres?")) {
+        for (let i = 1; i <= totalDays; i++) {
+          localStorage.removeItem(`hari${i}`);
+        }
+        loadTracker();
+      }
+    }
+
+    loadTracker();
+  </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kalkulator Money Management</title>
+  <style>
+    body {
+      background-color: #0b0f0c;
+      color: #e0ffe0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    h1 {
+      color: #00ff88;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      background-color: #112417;
+      color: #c0ffc0;
+      border: 1px solid #00ff88;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #00ff88;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background-color: #00e676;
+    }
+    .top-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn-kembali {
+      background-color: transparent;
+      color: #00ff88;
+      border: 1px solid #00ff88;
+    }
+    .btn-kembali:hover {
+      background-color: #003311;
+    }
+    .btn-reset {
+      background-color: transparent;
+      color: #ff6666;
+      border: 1px solid #ff6666;
+    }
+    .btn-reset:hover {
+      background-color: #330000;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #1f4032;
+      text-align: center;
+    }
+    th {
+      background-color: #00ff88;
+      color: #000;
+    }
+    tr:nth-child(even) {
+      background-color: #142e1f;
+    }
+    tr:nth-child(odd) {
+      background-color: #1a3d29;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-buttons">
+    <button class="btn-kembali" onclick="window.history.back()">🔙 Kembali</button>
+    <button class="btn-reset" onclick="hapusData()">🗑️ Hapus Data</button>
+  </div>
+
+  <h1>📊 Kalkulator Money Management</h1>
+
+  <label for="modal">💰 Modal Awal ($):</label>
+  <input type="number" id="modal" value="1000" step="0.01" />
+
+  <label for="profit">🎯 Target Profit per Hari (%):</label>
+  <input type="number" id="profit" value="10" step="0.01" />
+
+  <label for="hari">📆 Jumlah Hari:</label>
+  <input type="number" id="hari" value="10" />
+
+  <label for="tipe">📈 Tipe Pertumbuhan Profit:</label>
+  <select id="tipe">
+    <option value="biasa">Biasa (tetap)</option>
+    <option value="leverage">Majemuk (bertambah per hari)</option>
+  </select>
+
+  <button onclick="hitung()">🧮 Hitung</button>
+
+  <table id="hasil" style="display:none">
+    <thead>
+      <tr>
+        <th>Hari</th>
+        <th>Modal Awal ($)</th>
+        <th>Profit (%)</th>
+        <th>Profit ($)</th>
+        <th>Modal Akhir ($)</th>
+        <th>Sukses ✅</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    function formatDolar(angka) {
+      return angka.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function simpanCeklis(hari, isChecked) {
+      let data = JSON.parse(localStorage.getItem('profitCheckmarks')) || {};
+      data[hari] = isChecked;
+      localStorage.setItem('profitCheckmarks', JSON.stringify(data));
+    }
+
+    function ambilCeklis(hari) {
+      let data = JSON.parse(localStorage.getItem('profitCheckmarks')) || {};
+      return data[hari] || false;
+    }
+
+    function hapusData() {
+      localStorage.removeItem('profitCheckmarks');
+      alert('Data centang berhasil dihapus.');
+      hitung(); // refresh hasil agar centang ikut hilang
+    }
+
+    function hitung() {
+      const modalAwal = parseFloat(document.getElementById('modal').value);
+      const profitAwal = parseFloat(document.getElementById('profit').value);
+      const totalHari = parseInt(document.getElementById('hari').value);
+      const tipe = document.getElementById('tipe').value;
+
+      let tbody = document.querySelector('#hasil tbody');
+      tbody.innerHTML = '';
+      let modal = modalAwal;
+
+      for (let i = 1; i <= totalHari; i++) {
+        let profitPersen = tipe === "leverage" ? profitAwal + (i - 1) : profitAwal;
+        let persenDesimal = profitPersen / 100;
+        let profit = modal * persenDesimal;
+        let modalAkhir = modal + profit;
+        let hariKe = `hari${i}`;
+        let checked = ambilCeklis(hariKe) ? "checked" : "";
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${i}</td>
+            <td>$${formatDolar(modal)}</td>
+            <td>${profitPersen.toFixed(2)}%</td>
+            <td>$${formatDolar(profit)}</td>
+            <td>$${formatDolar(modalAkhir)}</td>
+            <td><input type="checkbox" ${checked} onchange="simpanCeklis('${hariKe}', this.checked)" /></td>
+          </tr>
+        `;
+
+        modal = modalAkhir;
+      }
+
+      document.getElementById('hasil').style.display = 'table';
+    }
+  </script>
+
+</body>
+</html>

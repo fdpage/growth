@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jurnal Trading Premium</title>
+  <style>
+    body {
+      background-color: #0a0f0d;
+      color: #e0ffe1;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    h1 {
+      color: #00ff99;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .btn-back, .btn-clear {
+      background-color: #1f1f1f;
+      color: #00ff99;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 10px;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    form {
+      background-color: #111;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #00ff9960;
+      max-width: 600px;
+      margin: 0 auto 2rem auto;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+      color: #aaffcc;
+    }
+    input, select, textarea {
+      width: 90%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #1a1a1a;
+      color: #e0ffe1;
+    }
+    button[type="submit"] {
+      background-color: #00ff99;
+      color: #000;
+      font-weight: bold;
+      padding: 10px;
+      margin-top: 20px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #00ff99;
+      color: #000;
+    }
+    tr:nth-child(even) {
+      background-color: #111;
+    }
+    tr:nth-child(odd) {
+      background-color: #1a1a1a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="btn-group">
+    <button class="btn-back" onclick="window.location.href='keuangan.html'">🔙 Kembali ke Keuangan</button>
+    <button class="btn-clear" onclick="hapusSemua()">🗑️ Hapus Semua Data</button>
+  </div>
+
+  <h1>📓 Jurnal Trading Premium</h1>
+  <form id="jurnalForm">
+    <label for="tanggal">Tanggal Eksekusi:</label>
+    <input type="date" id="tanggal" required>
+
+    <label for="pair">Pair/Symbol:</label>
+    <input type="text" id="pair" placeholder="cth: XAUUSD" required>
+
+    <label for="opsi">Opsi:</label>
+    <select id="opsi">
+      <option value="Buy">Buy</option>
+      <option value="Sell">Sell</option>
+    </select>
+
+    <label for="entry">Entry:</label>
+    <input type="number" step="0.01" id="entry" required>
+
+    <label for="sl">Stop Loss (SL):</label>
+    <input type="number" step="0.01" id="sl" required>
+
+    <label for="tp">Take Profit (TP):</label>
+    <input type="number" step="0.01" id="tp" required>
+
+    <label for="exit">Exit:</label>
+    <input type="number" step="0.01" id="exit" required>
+
+    <label for="hasil">Profit/Loss:</label>
+    <input type="text" id="hasil" required>
+
+    <label for="alasan">Alasan Entry:</label>
+    <textarea id="alasan" rows="3" placeholder="Misal: Breakout resistance + volume tinggi" required></textarea>
+
+    <button type="submit">Simpan Jurnal</button>
+  </form>
+
+  <table id="tabelJurnal">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Pair</th>
+        <th>Opsi</th>
+        <th>Entry</th>
+        <th>SL</th>
+        <th>TP</th>
+        <th>Exit</th>
+        <th>Hasil</th>
+        <th>Alasan</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById("jurnalForm");
+    const tbody = document.querySelector("#tabelJurnal tbody");
+
+    // Load data dari localStorage saat halaman dibuka
+    window.onload = function() {
+      const data = JSON.parse(localStorage.getItem("jurnalTrading")) || [];
+      data.forEach(item => tambahBaris(item));
+    };
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = {
+        tanggal: document.getElementById("tanggal").value,
+        pair: document.getElementById("pair").value,
+        opsi: document.getElementById("opsi").value,
+        entry: document.getElementById("entry").value,
+        sl: document.getElementById("sl").value,
+        tp: document.getElementById("tp").value,
+        exit: document.getElementById("exit").value,
+        hasil: document.getElementById("hasil").value,
+        alasan: document.getElementById("alasan").value
+      };
+
+      tambahBaris(data);
+
+      const allData = JSON.parse(localStorage.getItem("jurnalTrading")) || [];
+      allData.push(data);
+      localStorage.setItem("jurnalTrading", JSON.stringify(allData));
+
+      form.reset();
+    });
+
+    function tambahBaris(data) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${data.tanggal}</td>
+        <td>${data.pair}</td>
+        <td>${data.opsi}</td>
+        <td>${data.entry}</td>
+        <td>${data.sl}</td>
+        <td>${data.tp}</td>
+        <td>${data.exit}</td>
+        <td>${data.hasil}</td>
+        <td>${data.alasan}</td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function hapusSemua() {
+      if (confirm("Apakah kamu yakin ingin menghapus semua data jurnal?")) {
+        localStorage.removeItem("jurnalTrading");
+        tbody.innerHTML = "";
+      }
+    }
+  </script>
+</body>
+</html>

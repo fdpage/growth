@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>30 Hari Disiplin</title>
+  <style>
+    body {
+      background-color: #0a0f0d;
+      color: #e0ffe1;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    h1 {
+      color: #00ff99;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .btn {
+      background-color: #1f1f1f;
+      color: #00ff99;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    form {
+      background-color: #111;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #00ff9960;
+      max-width: 600px;
+      margin: 0 auto 2rem auto;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+      color: #aaffcc;
+    }
+    input, textarea {
+      width: 90%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #1a1a1a;
+      color: #e0ffe1;
+    }
+    button[type="submit"] {
+      background-color: #00ff99;
+      color: #000;
+      font-weight: bold;
+      padding: 10px;
+      margin-top: 20px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #00ff99;
+      color: #000;
+    }
+    tr:nth-child(even) {
+      background-color: #111;
+    }
+    tr:nth-child(odd) {
+      background-color: #1a1a1a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="btn-group">
+    <button class="btn" onclick="window.location.href='index.html'">🔙 Kembali</button>
+    <button class="btn" onclick="hapusSemua()">🗑️ Hapus Semua Data</button>
+  </div>
+
+  <h1>🔥 30 Hari Disiplin</h1>
+  <form id="disiplinForm">
+    <label for="tanggal">Tanggal:</label>
+    <input type="date" id="tanggal" required>
+
+    <label for="tugas">Tugas / Target Disiplin Hari Ini:</label>
+    <input type="text" id="tugas" placeholder="cth: Bangun jam 5 pagi, tidak FOMO trade" required>
+
+    <label for="evaluasi">Evaluasi:</label>
+    <textarea id="evaluasi" rows="3" placeholder="cth: Berhasil bangun pagi, tapi FOMO sedikit" required></textarea>
+
+    <label for="status">Status:</label>
+    <select id="status" required>
+      <option value="✅ Disiplin">✅ Disiplin</option>
+      <option value="⚠️ Gagal">⚠️ Gagal</option>
+    </select>
+
+    <button type="submit">Simpan Evaluasi</button>
+  </form>
+
+  <table id="tabelDisiplin">
+    <thead>
+      <tr>
+        <th>Hari</th>
+        <th>Tanggal</th>
+        <th>Tugas</th>
+        <th>Evaluasi</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById("disiplinForm");
+    const tbody = document.querySelector("#tabelDisiplin tbody");
+
+    // Load data saat awal
+    window.onload = function() {
+      const data = JSON.parse(localStorage.getItem("dataDisiplin")) || [];
+      data.forEach((item, index) => tambahBaris(item, index + 1));
+    };
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const data = {
+        tanggal: document.getElementById("tanggal").value,
+        tugas: document.getElementById("tugas").value,
+        evaluasi: document.getElementById("evaluasi").value,
+        status: document.getElementById("status").value
+      };
+
+      const allData = JSON.parse(localStorage.getItem("dataDisiplin")) || [];
+      allData.push(data);
+      localStorage.setItem("dataDisiplin", JSON.stringify(allData));
+
+      tambahBaris(data, allData.length);
+      form.reset();
+    });
+
+    function tambahBaris(data, hariKe) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>Hari ${hariKe}</td>
+        <td>${data.tanggal}</td>
+        <td>${data.tugas}</td>
+        <td>${data.evaluasi}</td>
+        <td>${data.status}</td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function hapusSemua() {
+      if (confirm("Apakah kamu yakin ingin menghapus semua data disiplin 30 hari?")) {
+        localStorage.removeItem("dataDisiplin");
+        tbody.innerHTML = "";
+      }
+    }
+  </script>
+</body>
+</html>

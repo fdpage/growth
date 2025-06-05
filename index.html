@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard For Growth</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #001a00;
+      color: #ccffcc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      color: #00ff99;
+      margin-bottom: 1.5rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+    .box {
+      background: #003300;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+      border: 1px solid #006600;
+    }
+    .box:hover {
+      transform: translateY(-5px);
+      background: #004d00;
+    }
+    .icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .motivasi-container {
+      background: #002600;
+      border: 1px solid #00cc66;
+      border-radius: 10px;
+      padding: 1.5rem;
+      max-width: 600px;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    #quote {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #00cc66;
+      color: #001a00;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background-color: #00e673;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard For Growth</h1>
+
+  <div class="grid">
+    <a href="keuangan.html">
+      <div class="box">
+        <div class="icon">💰</div>
+        <div>Keuangan</div>
+      </div>
+    </a>
+    <a href="kebugaran.html">
+      <div class="box">
+        <div class="icon">🏋️</div>
+        <div>Kebugaran</div>
+      </div>
+    </a>
+    <a href="native-daily.html">
+      <div class="box">
+        <div class="icon">📓</div>
+        <div>Native Daily</div>
+      </div>
+    </a>
+    <a href="30hari.html">
+      <div class="box">
+        <div class="icon">📅</div>
+        <div>30 Hari Disiplin</div>
+      </div>
+    </a>
+  </div>
+
+ <!-- Tambahan dalam tag <body> -->
+
+<div class="motivasi-container">
+  <div id="quote">Klik tombol di bawah untuk mendapatkan motivasi hari ini.</div>
+  <div id="video-container" style="margin-top: 1.5rem;"></div>
+  <button onclick="getMotivasi()">🎯 Dapatkan Motivasi</button>
+</div>
+
+<script>
+  const quotes = [
+    `"Kedisiplinan adalah jembatan antara tujuan dan pencapaian." — Jim Rohn`,
+    `"Jangan menunggu motivasi datang. Latihan dulu, motivasi akan ikut." — Anonim`,
+    `"Setiap kegagalan membawa pelajaran untuk sukses berikutnya." — Napoleon Hill`,
+    `"Market akan selalu ada, ego kita yang harus dijinakkan." — Mark Douglas`,
+    `"Semua trader hebat dulunya adalah trader biasa yang tidak menyerah." — Anonim`,
+    `"Sukses bukan soal menang hari ini, tapi konsisten setiap hari." — Fand Gritmind`,
+    `"Fokus pada proses, bukan hasil. Profit adalah efek samping dari disiplin." — Anonim`,
+    `"Lebih baik entry ketinggalan daripada masuk dengan emosi." — Anonim`,
+    `"Disiplin bukan pilihan, tapi harga yang dibayar untuk kebebasan." — Jocko Willink`,
+    `"Profit besar tidak datang dari banyak entry, tapi dari satu entry sabar." — Anonim`
+  ];
+
+  const videoEmbeds = [
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/TJDcGv9OH4Q" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/npoyc_X5zO8" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/7UbxJCIUQRE" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/_aU6ohpjNiw" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/6M_keF9qu04" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/e_Ht6ha0ssE" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`
+    
+    
+  ];
+
+  function getMotivasi() {
+    const quoteText = document.getElementById('quote');
+    const videoContainer = document.getElementById('video-container');
+
+    const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
+    const randomVideoIndex = Math.floor(Math.random() * videoEmbeds.length);
+
+    quoteText.innerText = quotes[randomQuoteIndex];
+    videoContainer.innerHTML = videoEmbeds[randomVideoIndex];
+  }
+</script>
+</body>
+</html>
