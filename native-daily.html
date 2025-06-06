@@ -105,99 +105,114 @@
   <div id="chartContainer">
     <canvas id="progressChart" height="300"></canvas>
   </div>
+<script>
+  let daftarKegiatan = [
+    "Bangun Subuh",
+    "Buka Buku & Belajar",
+    "Cari Informasi",
+    "Temukan Pengalaman atau Orang Baru",
+    "Bangun Ide / Hobi",
+    "Cari PWO Terlarang",
+    "Workout",
+    "No PMO",
+    "Bersih-bersih Rumah",
+    "No Scroll Medsos Berlebihan",
+    "Baca / Hafal Al-Qur'an"
+  ];
 
-  <script>
-    let daftarKegiatan = [
-      "Bangun Subuh",
-      "Buka Buku & Belajar",
-      "Cari Informasi",
-      "Temukan Pengalaman atau Orang Baru",
-      "Bangun Ide / Hobi",
-      "Cari PWO Terlarang",
-      "Workout",
-      "No PMO",
-      "Bersih-bersih Rumah",
-      "No Scroll Medsos Berlebihan",
-      "Baca / Hafal Al-Qur'an"
-    ];
+  const tbody = document.querySelector("#todoTable tbody");
+  const textarea = document.getElementById("editableTasks");
+  const todayKey = `nativeChecklist-${new Date().toISOString().split('T')[0]}`;
 
-    const tbody = document.querySelector("#todoTable tbody");
-    const textarea = document.getElementById("editableTasks");
+  textarea.value = daftarKegiatan.join("\n");
 
-    // Inisialisasi teks awal
-    textarea.value = daftarKegiatan.join("\n");
+  function muatTabel() {
+    daftarKegiatan = textarea.value.split("\n").map(item => item.trim()).filter(item => item);
+    tbody.innerHTML = "";
 
-    function muatTabel() {
-      daftarKegiatan = textarea.value.split("\n").map(item => item.trim()).filter(item => item);
-      tbody.innerHTML = "";
-      daftarKegiatan.forEach((item, i) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${item}</td>
-          <td><input type="checkbox" id="kegiatan-${i}"></td>
-        `;
-        tbody.appendChild(tr);
+    const savedChecklist = JSON.parse(localStorage.getItem(todayKey)) || [];
+
+    daftarKegiatan.forEach((item, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${item}</td>
+        <td><input type="checkbox" id="kegiatan-${i}" ${savedChecklist.includes(i) ? 'checked' : ''}></td>
+      `;
+      tbody.appendChild(tr);
+
+      // Tambahkan event untuk update localStorage ketika status berubah
+      document.getElementById(`kegiatan-${i}`).addEventListener('change', () => {
+        const checkedIndexes = daftarKegiatan.map((_, j) => {
+          const el = document.getElementById(`kegiatan-${j}`);
+          return el && el.checked ? j : null;
+        }).filter(index => index !== null);
+        localStorage.setItem(todayKey, JSON.stringify(checkedIndexes));
       });
-    }
+    });
+  }
 
-    function simpanData() {
-      const hariIni = new Date().toISOString().split('T')[0];
-      let skor = 0;
-      daftarKegiatan.forEach((_, i) => {
-        if (document.getElementById(`kegiatan-${i}`).checked) skor++;
-      });
+  function simpanData() {
+    const hariIni = new Date().toISOString().split('T')[0];
+    let skor = 0;
+    daftarKegiatan.forEach((_, i) => {
+      if (document.getElementById(`kegiatan-${i}`).checked) skor++;
+    });
 
-      const data = JSON.parse(localStorage.getItem("nativeDailyData")) || [];
-      data.push({ tanggal: hariIni, skor });
-      localStorage.setItem("nativeDailyData", JSON.stringify(data));
-      tampilkanGrafik(data);
-      alert("✅ Data berhasil disimpan!");
-    }
+    const data = JSON.parse(localStorage.getItem("nativeDailyData")) || [];
+    const existingIndex = data.findIndex(d => d.tanggal === hariIni);
+    if (existingIndex !== -1) data.splice(existingIndex, 1); // hapus data duplikat
+    data.push({ tanggal: hariIni, skor });
+    localStorage.setItem("nativeDailyData", JSON.stringify(data));
+    tampilkanGrafik(data);
+    alert("✅ Data berhasil disimpan!");
+  }
 
-    function tampilkanGrafik(data) {
-      const ctx = document.getElementById('progressChart').getContext('2d');
-      const labels = data.map(entry => entry.tanggal);
-      const skor = data.map(entry => entry.skor);
-      if (window.grafik) window.grafik.destroy();
-      window.grafik = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Skor Harian',
-            data: skor,
-            borderColor: '#00ff99',
-            backgroundColor: '#00ff9940',
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#00ff99'
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              min: 0,
-              max: daftarKegiatan.length,
-              ticks: { stepSize: 1 }
-            }
+  function tampilkanGrafik(data) {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const labels = data.map(entry => entry.tanggal);
+    const skor = data.map(entry => entry.skor);
+    if (window.grafik) window.grafik.destroy();
+    window.grafik = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Skor Harian',
+          data: skor,
+          borderColor: '#00ff99',
+          backgroundColor: '#00ff9940',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#00ff99'
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            min: 0,
+            max: daftarKegiatan.length,
+            ticks: { stepSize: 1 }
           }
         }
-      });
-    }
-
-    function hapusSemua() {
-      if (confirm("⚠️ Yakin ingin menghapus semua data yang tersimpan?")) {
-        localStorage.removeItem("nativeDailyData");
-        if (window.grafik) window.grafik.destroy();
-        alert("🗑️ Data berhasil dihapus!");
       }
-    }
+    });
+  }
 
-    // Inisialisasi
-    muatTabel();
-    const dataLama = JSON.parse(localStorage.getItem("nativeDailyData")) || [];
-    if (dataLama.length > 0) tampilkanGrafik(dataLama);
-  </script>
+  function hapusSemua() {
+    if (confirm("⚠️ Yakin ingin menghapus semua data yang tersimpan?")) {
+      localStorage.removeItem("nativeDailyData");
+      localStorage.removeItem(todayKey);
+      if (window.grafik) window.grafik.destroy();
+      alert("🗑️ Data berhasil dihapus!");
+      muatTabel();
+    }
+  }
+
+  // Inisialisasi
+  muatTabel();
+  const dataLama = JSON.parse(localStorage.getItem("nativeDailyData")) || [];
+  if (dataLama.length > 0) tampilkanGrafik(dataLama);
+</script>
 </body>
 </html>
