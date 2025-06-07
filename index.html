@@ -1,218 +1,292 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Native Daily Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      background-color: #0f0f0f;
-      color: #e0ffe1;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
-    }
-    h1 {
-      text-align: center;
-      color: #00ff99;
-      margin-bottom: 1rem;
-    }
-    .btn-container {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    button {
-      background-color: #00ff99;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      margin: 0.5rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1.5rem;
-    }
-    th, td {
-      border: 1px solid #333;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #00ff99;
-      color: #000;
-    }
-    tr:nth-child(even) {
-      background-color: #111;
-    }
-    tr:nth-child(odd) {
-      background-color: #1a1a1a;
-    }
-    #chartContainer {
-      max-width: 1000px;
-      margin: 2rem auto;
-    }
-    textarea {
-      width: 100%;
-      height: 120px;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      margin-bottom: 1rem;
-      background: #1a1a1a;
-      color: #e0ffe1;
-    }
-    .btn-back {
-      display: inline-block;
-      margin-bottom: 1rem;
-      padding: 10px 30px;
-      background-color: #222;
-      color: #00ff99;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      text-decoration: none;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard For Growth</title>
+ <style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap');
+
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #001a00;
+    color: #ccffcc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .growth-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    letter-spacing: -1px;
+  }
+
+  h1 {
+    color: #00ff99;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 2rem;
+  }
+
+  .box {
+    background: #003300;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    border: 1px solid #006600;
+  }
+
+  .box:hover {
+    transform: translateY(-5px);
+    background: #004d00;
+  }
+
+  .icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .motivasi-container {
+    background: #002600;
+    border: 1px solid #00cc66;
+    border-radius: 10px;
+    padding: 1.5rem;
+    max-width: 600px;
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  #quote {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  button {
+    padding: 10px 20px;
+    background-color: #00cc66;
+    color: #001a00;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background-color: #00e673;
+  }
+
+  /* 🔍 Search input styling seperti Google */
+  input#search-input {
+    flex: 1 1 100%;
+    padding: 14px 18px;
+    border-radius: 999px;
+    border: 1px solid #00cc66;
+    background-color: #003300;
+    color: #ccffcc;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+
+  input#search-input::placeholder {
+    color: #88ffaa;
+  }
+
+  input#search-input:focus {
+    border-color: #00ff99;
+    box-shadow: 0 0 6px #00ff99;
+  }
+  
+  .search-wrapper {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid #00cc66;
+  background-color: #003300;
+}
+
+.search-wrapper input,
+.search-wrapper select,
+.search-wrapper button {
+  border: none;
+  outline: none;
+  padding: 14px 16px;
+  font-size: 1rem;
+  background-color: transparent;
+  color: #ccffcc;
+}
+
+.search-wrapper input {
+  flex: 2;
+  background-color: transparent;
+}
+
+.search-wrapper select {
+  flex: 1;
+  background-color: #004d00;
+}
+
+.search-wrapper button {
+  background-color: #00cc66;
+  color: #001a00;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.search-wrapper button:hover {
+  background-color: #00e673;
+}
+</style>
 </head>
 <body>
-  <a class="btn-back" href="index.html">⬅️ Kembali</a>
-  <h1>✅ Native Daily Tracker</h1>
+  <div class="growth-title">Growth App</div>
+  <form onsubmit="handleSearch(event)" style="margin-bottom: 2rem; width: 100%; max-width: 600px;">
+  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+    <input id="search-input" type="text" placeholder="Cari sesuatu..."
+      style="flex: 1 1 100%; padding: 12px; border-radius: 8px; border: 1px solid #00cc66; background-color: #003300; color: #ccffcc; font-size: 1rem;" required />
 
-  <label for="editableTasks">📝 Edit To-Do List (1 per baris):</label>
-  <textarea id="editableTasks"></textarea>
-  
-  <div class="btn-container">
-    <button onclick="muatTabel()">🔄 Muat Ulang Tabel</button>
-    <button onclick="simpanData()">💾 Simpan Hari Ini</button>
-    <button onclick="hapusSemua()">🗑️ Hapus Semua Data</button>
+    <div style="display: flex; flex: 1 1 100%; gap: 0.5rem;">
+      <select id="search-engine"
+        style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #00cc66; background-color: #004d00; color: #ccffcc; font-size: 1rem;">
+        <option value="google">🔍 Google</option>
+        <option value="youtube">📺 YouTube</option>
+        <option value="ecosia">🌱 Ecosia</option>
+        <option value="wikipedia">📚 Wikipedia</option>
+      </select>
+
+      <button type="submit"
+        style="padding: 12px 20px; border: none; border-radius: 8px; background-color: #00cc66; color: #001a00; font-weight: bold; font-size: 1rem; cursor: pointer; flex-shrink: 0;">
+        Cari
+      </button>
+    </div>
+  </div>
+</form>
+  <h1>Dashboard For Growth</h1>
+
+  <div class="grid">
+    <a href="keuangan.html">
+      <div class="box">
+        <div class="icon">💰</div>
+        <div>Keuangan</div>
+      </div>
+    </a>
+    <a href="kebugaran.html">
+      <div class="box">
+        <div class="icon">🏋️</div>
+        <div>Kebugaran</div>
+      </div>
+    </a>
+    <a href="native-daily.html">
+      <div class="box">
+        <div class="icon">📓</div>
+        <div>Native Daily</div>
+      </div>
+    </a>
+    <a href="30hari.html">
+      <div class="box">
+        <div class="icon">📅</div>
+        <div>30 Hari Disiplin</div>
+      </div>
+    </a>
   </div>
 
-  <table id="todoTable">
-    <thead>
-      <tr>
-        <th>Kegiatan</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+ <!-- Tambahan dalam tag <body> -->
 
-  <div id="chartContainer">
-    <canvas id="progressChart" height="300"></canvas>
-  </div>
+<div class="motivasi-container">
+  <div id="quote">Klik tombol di bawah untuk mendapatkan motivasi hari ini.</div>
+  <div id="video-container" style="margin-top: 1.5rem;"></div>
+  <button onclick="getMotivasi()">🎯 Dapatkan Motivasi</button>
+</div>
+
 <script>
-  let daftarKegiatan = [
-    "Bangun Subuh",
-    "Buka Buku & Belajar",
-    "Cari Informasi",
-    "Temukan Pengalaman atau Orang Baru",
-    "Bangun Ide / Hobi",
-    "Cari PWO Terlarang",
-    "Workout",
-    "No PMO",
-    "Bersih-bersih Rumah",
-    "No Scroll Medsos Berlebihan",
-    "Baca / Hafal Al-Qur'an"
+  const quotes = [
+    `"Kedisiplinan adalah jembatan antara tujuan dan pencapaian." — Jim Rohn`,
+    `"Jangan menunggu motivasi datang. Latihan dulu, motivasi akan ikut." — Anonim`,
+    `"Setiap kegagalan membawa pelajaran untuk sukses berikutnya." — Napoleon Hill`,
+    `"Market akan selalu ada, ego kita yang harus dijinakkan." — Mark Douglas`,
+    `"Semua trader hebat dulunya adalah trader biasa yang tidak menyerah." — Anonim`,
+    `"Sukses bukan soal menang hari ini, tapi konsisten setiap hari." — Fand Gritmind`,
+    `"Fokus pada proses, bukan hasil. Profit adalah efek samping dari disiplin." — Anonim`,
+    `"Lebih baik entry ketinggalan daripada masuk dengan emosi." — Anonim`,
+    `"Disiplin bukan pilihan, tapi harga yang dibayar untuk kebebasan." — Jocko Willink`,
+    `"Profit besar tidak datang dari banyak entry, tapi dari satu entry sabar." — Anonim`
   ];
 
-  const tbody = document.querySelector("#todoTable tbody");
-  const textarea = document.getElementById("editableTasks");
-  const todayKey = `nativeChecklist-${new Date().toISOString().split('T')[0]}`;
+  const videoEmbeds = [
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/TJDcGv9OH4Q" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/npoyc_X5zO8" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/7UbxJCIUQRE" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/_aU6ohpjNiw" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/6M_keF9qu04" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`,
+    `<iframe width="100%" height="315" src="https://www.youtube.com/embed/e_Ht6ha0ssE" title="Ekonomi - Motivasi Hidup" frameborder="0" allowfullscreen></iframe>`
+    
+    
+  ];
 
-  textarea.value = daftarKegiatan.join("\n");
+  function getMotivasi() {
+    const quoteText = document.getElementById('quote');
+    const videoContainer = document.getElementById('video-container');
 
-  function muatTabel() {
-    daftarKegiatan = textarea.value.split("\n").map(item => item.trim()).filter(item => item);
-    tbody.innerHTML = "";
+    const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
+    const randomVideoIndex = Math.floor(Math.random() * videoEmbeds.length);
 
-    const savedChecklist = JSON.parse(localStorage.getItem(todayKey)) || [];
-
-    daftarKegiatan.forEach((item, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${item}</td>
-        <td><input type="checkbox" id="kegiatan-${i}" ${savedChecklist.includes(i) ? 'checked' : ''}></td>
-      `;
-      tbody.appendChild(tr);
-
-      // Tambahkan event untuk update localStorage ketika status berubah
-      document.getElementById(`kegiatan-${i}`).addEventListener('change', () => {
-        const checkedIndexes = daftarKegiatan.map((_, j) => {
-          const el = document.getElementById(`kegiatan-${j}`);
-          return el && el.checked ? j : null;
-        }).filter(index => index !== null);
-        localStorage.setItem(todayKey, JSON.stringify(checkedIndexes));
-      });
-    });
+    quoteText.innerText = quotes[randomQuoteIndex];
+    videoContainer.innerHTML = videoEmbeds[randomVideoIndex];
   }
-
-  function simpanData() {
-    const hariIni = new Date().toISOString().split('T')[0];
-    let skor = 0;
-    daftarKegiatan.forEach((_, i) => {
-      if (document.getElementById(`kegiatan-${i}`).checked) skor++;
-    });
-
-    const data = JSON.parse(localStorage.getItem("nativeDailyData")) || [];
-    const existingIndex = data.findIndex(d => d.tanggal === hariIni);
-    if (existingIndex !== -1) data.splice(existingIndex, 1); // hapus data duplikat
-    data.push({ tanggal: hariIni, skor });
-    localStorage.setItem("nativeDailyData", JSON.stringify(data));
-    tampilkanGrafik(data);
-    alert("✅ Data berhasil disimpan!");
-  }
-
-  function tampilkanGrafik(data) {
-    const ctx = document.getElementById('progressChart').getContext('2d');
-    const labels = data.map(entry => entry.tanggal);
-    const skor = data.map(entry => entry.skor);
-    if (window.grafik) window.grafik.destroy();
-    window.grafik = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Skor Harian',
-          data: skor,
-          borderColor: '#00ff99',
-          backgroundColor: '#00ff9940',
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: '#00ff99'
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            min: 0,
-            max: daftarKegiatan.length,
-            ticks: { stepSize: 1 }
-          }
-        }
-      }
-    });
-  }
-
-  function hapusSemua() {
-    if (confirm("⚠️ Yakin ingin menghapus semua data yang tersimpan?")) {
-      localStorage.removeItem("nativeDailyData");
-      localStorage.removeItem(todayKey);
-      if (window.grafik) window.grafik.destroy();
-      alert("🗑️ Data berhasil dihapus!");
-      muatTabel();
-    }
-  }
-
-  // Inisialisasi
-  muatTabel();
-  const dataLama = JSON.parse(localStorage.getItem("nativeDailyData")) || [];
-  if (dataLama.length > 0) tampilkanGrafik(dataLama);
 </script>
+<script>
+  function handleSearch(event) {
+    event.preventDefault();
+    const query = document.getElementById('search-input').value.trim();
+    const engine = document.getElementById('search-engine').value;
+    let url = '';
+
+    switch (engine) {
+      case 'google':
+        url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        break;
+      case 'youtube':
+        url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+        break;
+      case 'ecosia':
+        url = `https://www.ecosia.org/search?q=${encodeURIComponent(query)}`;
+        break;
+      case 'wikipedia':
+        url = `https://id.wikipedia.org/wiki/${encodeURIComponent(query)}`;
+        break;
+    }
+
+    window.open(url, '_blank');
+  }
+</script>
+<!-- Footer -->
+<footer style="margin-top: 3rem; text-align: center; font-size: 0.9rem; color: #88ffcc;">
+  By <a href="https://fandportofolio.netlify.app/" target="_blank" style="color: #00ff99; text-decoration: none;">Fandev</a>
+</footer>
 </body>
 </html>
