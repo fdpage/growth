@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compounding Tracker</title>
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: #d0ffd6;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #00ff99;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 2rem;
+    }
+    li {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    li.checked {
+      text-decoration: line-through;
+      color: #888;
+      background-color: #111;
+    }
+    input[type="checkbox"] {
+      transform: scale(1.3);
+      accent-color: #00ff99;
+    }
+    button, input[type="number"] {
+      background-color: #00ff99;
+      color: #000;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .controls {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .form-inputs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    input[type="number"] {
+      width: 140px;
+      text-align: center;
+    }
+    .btn-back {
+      display: inline-block;
+      margin-bottom: 1rem;
+      padding: 10px 30px;
+      background-color: #222;
+      color: #00ff99;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <a class="btn-back" href="keuangan.html">⬅️ Kembali</a>
+  <h1>📈 Compounding 10% Tracker</h1>
+
+  <div class="form-inputs">
+    <label>Modal Awal (cent): <input type="number" id="modalAwal" value="100" min="1"></label>
+    <label>Target Akhir (cent): <input type="number" id="targetAkhir" value="10000" min="100"></label>
+  </div>
+
+  <div class="controls">
+    <button onclick="generatePlan()">🔄 Buat Ulang Plan</button>
+    <button onclick="resetPlan()">🗑️ Reset Checklist</button>
+  </div>
+
+  <ul id="planList"></ul>
+
+  <script>
+    const planList = document.getElementById("planList");
+    const checklistKey = "compoundingChecklist";
+
+    function generatePlan() {
+      const modalAwal = parseFloat(document.getElementById("modalAwal").value);
+      const targetAkhir = parseFloat(document.getElementById("targetAkhir").value);
+      const saved = JSON.parse(localStorage.getItem(checklistKey)) || [];
+
+      if (isNaN(modalAwal) || isNaN(targetAkhir) || modalAwal <= 0 || targetAkhir <= modalAwal) {
+        alert("❗ Masukkan angka yang valid.");
+        return;
+      }
+
+      let planData = [];
+      let current = modalAwal;
+      while (current < targetAkhir && planData.length < 100) {
+        planData.push(current);
+        current *= 1.1;
+      }
+
+      planList.innerHTML = "";
+      planData.forEach((modal, i) => {
+        const day = i + 1;
+        const profit = (modal * 0.1).toFixed(2);
+        const akhir = (modal * 1.1).toFixed(2);
+        const li = document.createElement("li");
+
+        li.className = saved.includes(day + "-" + modalAwal + "-" + targetAkhir) ? "checked" : "";
+        li.innerHTML = `
+          <span><strong>Hari ${day}:</strong> Modal ${modal.toFixed(2)} ➜ Profit ${profit} ➜ Total ${akhir}</span>
+          <input type="checkbox" ${li.className ? "checked" : ""} onchange="toggle(${day}, ${modalAwal}, ${targetAkhir})">
+        `;
+        planList.appendChild(li);
+      });
+    }
+
+    function toggle(day, modalAwal, targetAkhir) {
+      let saved = JSON.parse(localStorage.getItem(checklistKey)) || [];
+      const key = day + "-" + modalAwal + "-" + targetAkhir;
+
+      if (saved.includes(key)) {
+        saved = saved.filter(k => k !== key);
+      } else {
+        saved.push(key);
+      }
+      localStorage.setItem(checklistKey, JSON.stringify(saved));
+      generatePlan();
+    }
+
+    function resetPlan() {
+      if (confirm("Yakin ingin mereset semua checklist?")) {
+        localStorage.removeItem(checklistKey);
+        generatePlan();
+      }
+    }
+
+    // Inisialisasi awal
+    generatePlan();
+  </script>
+</body>
+</html>
