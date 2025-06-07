@@ -2,206 +2,282 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jurnal Trading Premium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jurnal Trading</title>
   <style>
     body {
-      background-color: #0a0f0d;
-      color: #e0ffe1;
+      background-color: #0c1f14;
+      color: #d0ffd6;
       font-family: 'Segoe UI', sans-serif;
       padding: 2rem;
     }
+
     h1 {
-      color: #00ff99;
-      font-size: 2rem;
-      margin-bottom: 1rem;
       text-align: center;
+      color: #3aff8e;
+      margin-bottom: 2rem;
     }
-    .btn-back, .btn-clear {
-      background-color: #1f1f1f;
-      color: #00ff99;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      margin: 10px;
+
+    .form-container, .results {
+      background-color: #123824;
+      padding: 1.5rem;
+      border-radius: 15px;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 15px rgba(0, 255, 100, 0.1);
     }
-    .btn-group {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    form {
-      background-color: #111;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #00ff9960;
-      max-width: 600px;
-      margin: 0 auto 2rem auto;
-    }
+
     label {
       display: block;
-      margin: 15px 0 5px;
-      font-weight: bold;
-      color: #aaffcc;
+      margin-top: 1rem;
+      color: #b5ffcd;
     }
+
     input, select, textarea {
-      width: 90%;
+      width: 100%;
       padding: 10px;
-      border: none;
       border-radius: 8px;
-      background-color: #1a1a1a;
-      color: #e0ffe1;
+      border: none;
+      margin-top: 5px;
+      font-size: 1rem;
+      background-color: #1f3d2c;
+      color: #dfffe4;
     }
-    button[type="submit"] {
-      background-color: #00ff99;
-      color: #000;
+
+    textarea {
+      resize: vertical;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+   .controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.controls button,
+.controls .button-link {
+  padding: 10px 16px;
+  font-size: 1rem;
+  border-radius: 10px;
+  background-color: #3aff8e;
+  color: #00331c;
+  text-decoration: none;
+  border: none;
+  font-weight: bold;
+  flex: 1 1 48%;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+    .controls button:hover, .controls .button-link:hover {
+      background-color: #2ee577;
+    }
+
+    button {
+      background-color: #00cc66;
+      color: #002d1a;
       font-weight: bold;
-      padding: 10px;
-      margin-top: 20px;
-      width: 100%;
-      border: none;
-      border-radius: 8px;
+      padding: 12px;
+      border-radius: 10px;
       cursor: pointer;
-    }
-    table {
+      border: none;
+      margin-top: 1rem;
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 2rem;
     }
-    th, td {
-      border: 1px solid #333;
-      padding: 10px;
-      text-align: center;
+
+    button:hover {
+      background-color: #00aa55;
     }
-    th {
-      background-color: #00ff99;
-      color: #000;
+
+    .result-item {
+      background-color: rgba(0, 255, 100, 0.08);
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 10px;
+      line-height: 1.6;
     }
-    tr:nth-child(even) {
-      background-color: #111;
+
+    .buy {
+      color: #3acfff;
     }
-    tr:nth-child(odd) {
-      background-color: #1a1a1a;
+
+    .sell {
+      color: #ff6b6b;
+    }
+
+    .win {
+      color: #6aff90;
+      font-weight: bold;
+    }
+
+    .lose {
+      color: #ff7d7d;
+      font-weight: bold;
+    }
+
+    ::selection {
+      background: #2ee577;
+      color: #001d11;
     }
   </style>
 </head>
 <body>
 
-  <div class="btn-group">
-    <button class="btn-back" onclick="window.location.href='keuangan.html'">🔙 Kembali ke Keuangan</button>
-    <button class="btn-clear" onclick="hapusSemua()">🗑️ Hapus Semua Data</button>
+  <h1>📒 Jurnal Trading Harian</h1>
+
+  <div class="controls">
+    <a href="keuangan.html" class="button-link">⬅️ Kembali</a>
+    <button onclick="clearData()">🗑️ Hapus Semua Data</button>
   </div>
 
-  <h1>📓 Jurnal Trading Premium</h1>
-  <form id="jurnalForm">
-    <label for="tanggal">Tanggal Eksekusi:</label>
-    <input type="date" id="tanggal" required>
+  <div class="form-container">
+    <div class="form-group">
+      <label for="tanggal">Tanggal Eksekusi</label>
+      <input type="date" id="tanggal" />
+    </div>
 
-    <label for="pair">Pair/Symbol:</label>
-    <input type="text" id="pair" placeholder="cth: XAUUSD" required>
+    <div class="form-group">
+      <label for="asset">Asset (contoh: XAUUSD, BTCUSD)</label>
+      <input type="text" id="asset" placeholder="Contoh: BTCUSD" />
+    </div>
 
-    <label for="opsi">Opsi:</label>
-    <select id="opsi">
-      <option value="Buy">Buy</option>
-      <option value="Sell">Sell</option>
-    </select>
+    <div class="form-group">
+      <label for="opsi">Opsi</label>
+      <select id="opsi">
+        <option value="Buy">Buy</option>
+        <option value="Sell">Sell</option>
+      </select>
+    </div>
 
-    <label for="entry">Entry:</label>
-    <input type="number" step="0.01" id="entry" required>
+    <div class="form-group">
+      <label for="harga">Entry di Harga</label>
+      <input type="number" id="harga" placeholder="Contoh: 2375.5" />
+    </div>
 
-    <label for="sl">Stop Loss (SL):</label>
-    <input type="number" step="0.01" id="sl" required>
+    <div class="form-group">
+      <label for="entry">Entry Model</label>
+      <input type="text" id="entry" placeholder="Contoh: FVG, Turtle Soup" />
+    </div>
 
-    <label for="tp">Take Profit (TP):</label>
-    <input type="number" step="0.01" id="tp" required>
+    <div class="form-group">
+      <label for="killzone">Kill Zone</label>
+      <select id="killzone">
+        <option value="London Open">London Open</option>
+        <option value="New York Open">New York Open</option>
+        <option value="Asian Range">Asian Range</option>
+        <option value="No Killzone">No Killzone</option>
+      </select>
+    </div>
 
-    <label for="exit">Exit:</label>
-    <input type="number" step="0.01" id="exit" required>
+    <div class="form-group">
+      <label for="result">Hasil</label>
+      <select id="result">
+        <option value="WIN">WIN</option>
+        <option value="LOSE">LOSE</option>
+      </select>
+    </div>
 
-    <label for="hasil">Profit/Loss:</label>
-    <input type="text" id="hasil" required>
+    <div class="form-group">
+      <label for="nilai">Profit/Loss (cent)</label>
+      <input type="number" id="nilai" placeholder="Contoh: 50 atau -30" />
+    </div>
 
-    <label for="alasan">Alasan Entry:</label>
-    <textarea id="alasan" rows="3" placeholder="Misal: Breakout resistance + volume tinggi" required></textarea>
+    <div class="form-group">
+      <label for="tf">Time Frame</label>
+      <select id="tf">
+        <option value="M1">M1</option>
+        <option value="M5">M5</option>
+        <option value="M15">M15</option>
+        <option value="M30">M30</option>
+        <option value="H1">H1</option>
+        <option value="H4">H4</option>
+        <option value="D1">D1</option>
+      </select>
+    </div>
 
-    <button type="submit">Simpan Jurnal</button>
-  </form>
+    <div class="form-group">
+      <label for="alasan">Alasan Entry</label>
+      <select id="alasan">
+        <option value="Breakout">Breakout</option>
+        <option value="Retest">Retest</option>
+        <option value="Liquidity Grab">Liquidity Grab</option>
+        <option value="News Momentum">News Momentum</option>
+        <option value="Other">Lainnya</option>
+      </select>
+    </div>
 
-  <table id="tabelJurnal">
-    <thead>
-      <tr>
-        <th>Tanggal</th>
-        <th>Pair</th>
-        <th>Opsi</th>
-        <th>Entry</th>
-        <th>SL</th>
-        <th>TP</th>
-        <th>Exit</th>
-        <th>Hasil</th>
-        <th>Alasan</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <div class="form-group">
+      <label for="deskripsi">Deskripsi Pendek</label>
+      <textarea id="deskripsi" placeholder="Kenapa kamu entry di momen ini..."></textarea>
+    </div>
+
+    <button onclick="simpan()">✅ Simpan Catatan</button>
+  </div>
+
+  <div class="results" id="results"></div>
 
   <script>
-    const form = document.getElementById("jurnalForm");
-    const tbody = document.querySelector("#tabelJurnal tbody");
+    const key = "jurnalTradingFand";
 
-    // Load data dari localStorage saat halaman dibuka
-    window.onload = function() {
-      const data = JSON.parse(localStorage.getItem("jurnalTrading")) || [];
-      data.forEach(item => tambahBaris(item));
-    };
-
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
+    function simpan() {
       const data = {
         tanggal: document.getElementById("tanggal").value,
-        pair: document.getElementById("pair").value,
+        asset: document.getElementById("asset").value,
         opsi: document.getElementById("opsi").value,
+        harga: document.getElementById("harga").value,
         entry: document.getElementById("entry").value,
-        sl: document.getElementById("sl").value,
-        tp: document.getElementById("tp").value,
-        exit: document.getElementById("exit").value,
-        hasil: document.getElementById("hasil").value,
-        alasan: document.getElementById("alasan").value
+        killzone: document.getElementById("killzone").value,
+        result: document.getElementById("result").value,
+        nilai: document.getElementById("nilai").value,
+        tf: document.getElementById("tf").value,
+        alasan: document.getElementById("alasan").value,
+        deskripsi: document.getElementById("deskripsi").value,
       };
 
-      tambahBaris(data);
+      if (!data.tanggal || !data.asset || !data.harga) {
+        alert("Isi minimal tanggal, asset, dan harga.");
+        return;
+      }
 
-      const allData = JSON.parse(localStorage.getItem("jurnalTrading")) || [];
-      allData.push(data);
-      localStorage.setItem("jurnalTrading", JSON.stringify(allData));
-
-      form.reset();
-    });
-
-    function tambahBaris(data) {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${data.tanggal}</td>
-        <td>${data.pair}</td>
-        <td>${data.opsi}</td>
-        <td>${data.entry}</td>
-        <td>${data.sl}</td>
-        <td>${data.tp}</td>
-        <td>${data.exit}</td>
-        <td>${data.hasil}</td>
-        <td>${data.alasan}</td>
-      `;
-      tbody.appendChild(row);
+      const existing = JSON.parse(localStorage.getItem(key)) || [];
+      existing.unshift(data);
+      localStorage.setItem(key, JSON.stringify(existing));
+      tampilkan();
     }
 
-    function hapusSemua() {
-      if (confirm("Apakah kamu yakin ingin menghapus semua data jurnal?")) {
-        localStorage.removeItem("jurnalTrading");
-        tbody.innerHTML = "";
+    function tampilkan() {
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+      const data = JSON.parse(localStorage.getItem(key)) || [];
+
+      data.forEach((item, i) => {
+        const div = document.createElement("div");
+        div.className = "result-item";
+        div.innerHTML = `
+          <strong>${item.tanggal}</strong> | <span class="${item.opsi.toLowerCase()}">${item.opsi}</span> ${item.asset} @ ${item.harga} |
+          <span class="${item.result.toLowerCase()}">${item.result} $${item.nilai}</span> | TF: ${item.tf}<br>
+          Entry: ${item.entry} | Kill Zone: ${item.killzone}<br>
+          Alasan: ${item.alasan} | <em>${item.deskripsi}</em>
+        `;
+        results.appendChild(div);
+      });
+    }
+
+    function clearData() {
+      if (confirm("Yakin ingin menghapus semua data jurnal?")) {
+        localStorage.removeItem(key);
+        tampilkan();
       }
     }
+
+    tampilkan();
   </script>
+
 </body>
 </html>
