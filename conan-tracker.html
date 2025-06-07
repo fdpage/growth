@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detective Conan Non-Filler Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b3d0b;
+      color: #d3f4d3;
+      margin: 0; padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #a7d89c;
+    }
+    input[type="search"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px 0 20px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      margin-right: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #388e3c;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #164816;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #2c7a2c;
+      text-align: left;
+    }
+    th {
+      background: #206020;
+    }
+    tr:hover {
+      background: #2c7a2c;
+    }
+    label {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<button onclick="goBack()">⬅️ Kembali</button>
+<button onclick="resetChecklist()">🗑️ Hapus Semua Ceklis</button>
+
+<h1>Detective Conan Non-Filler Tracker</h1>
+
+<input type="search" id="searchInput" placeholder="Cari nomor atau judul episode..." />
+
+<table>
+  <thead>
+    <tr>
+      <th>No. Episode</th>
+      <th>Judul Singkat</th>
+      <th>Tandai Sudah Ditonton</th>
+    </tr>
+  </thead>
+  <tbody id="episodeTableBody">
+    <!-- Data akan dimuat oleh JavaScript -->
+  </tbody>
+</table>
+
+<script>
+  function goBack() {
+    window.history.back();
+  }
+
+  function resetChecklist() {
+    if (confirm("Kamu yakin ingin menghapus semua tanda ceklis?")) {
+      episodes.forEach(e => {
+        localStorage.removeItem("conan_episode_" + e.num);
+      });
+      renderTable(searchInput.value);
+    }
+  }
+
+  const episodes = [
+    {num: 1, title: "Kasus Pertama (Asal Usul Conan)"},
+    {num: 2, title: "Kasus Canon"},
+    {num: 3, title: "Kasus Canon"},
+    {num: 4, title: "Kasus Canon"},
+    {num: 5, title: "Kasus Canon"},
+    {num: 11, title: "Perkenalan Karakter"},
+    {num: 12, title: "Perkenalan Karakter"},
+    {num: 18, title: "Shinichi Muncul"},
+    {num: 20, title: "Ran Hampir Tahu"},
+    {num: 43, title: "Kasus Penthouse I"},
+    {num: 44, title: "Kasus Penthouse II"},
+    {num: 45, title: "Kasus Penthouse III"},
+    {num: 48, title: "Black Organization Muncul I"},
+    {num: 49, title: "Black Organization Muncul II"},
+    {num: 54, title: "Teka-Teki Penting I"},
+    {num: 55, title: "Teka-Teki Penting II"},
+    {num: 57, title: "Kaitou Kid Muncul I"},
+    {num: 58, title: "Kaitou Kid Muncul II"},
+    {num: 118, title: "Vermouth Terlibat I"},
+    {num: 119, title: "Vermouth Terlibat II"},
+    {num: 128, title: "Penjelasan Organisasi I"},
+    {num: 129, title: "Penjelasan Organisasi II"},
+    {num: 176, title: "Kasus Penting I"},
+    {num: 177, title: "Kasus Penting II"},
+    {num: 178, title: "Kasus Penting III"},
+    {num: 230, title: "Organisasi Hitam: Pisco I"},
+    {num: 231, title: "Organisasi Hitam: Pisco II"},
+    {num: 243, title: "Vermouth & Haibara I"},
+    {num: 244, title: "Vermouth & Haibara II"},
+    {num: 263, title: "Sinyal Komunikasi Organisasi I"},
+    {num: 264, title: "Sinyal Komunikasi Organisasi II"},
+    {num: 307, title: "Jodie vs Vermouth I"},
+    {num: 308, title: "Jodie vs Vermouth II"},
+    {num: 345, title: "Head-to-Head Black Organization"},
+    {num: 421, title: "Black Impact! Bagian 1"},
+    {num: 422, title: "Black Impact! Bagian 2"},
+    {num: 462, title: "Kasus Eisuke I"},
+    {num: 463, title: "Kasus Eisuke II"},
+    {num: 464, title: "Kasus Eisuke III"},
+    {num: 465, title: "Kasus Eisuke IV"},
+    {num: 504, title: "Rencana Organisasi I"},
+    {num: 505, title: "Rencana Organisasi II"},
+    {num: 507, title: "Conan Hampir Ketahuan I"},
+    {num: 508, title: "Conan Hampir Ketahuan II"},
+    {num: 516, title: "Okiya Subaru Muncul I"},
+    {num: 517, title: "Okiya Subaru Muncul II"},
+    {num: 522, title: "Haibara Terancam I"},
+    {num: 523, title: "Haibara Terancam II"},
+    {num: 622, title: "The Devil's Domain I"},
+    {num: 623, title: "The Devil's Domain II"},
+    {num: 624, title: "The Devil's Domain III"},
+    {num: 646, title: "Plot Subaru & RUM I"},
+    {num: 647, title: "Plot Subaru & RUM II"},
+    {num: 671, title: "File Penting RUM I"},
+    {num: 672, title: "File Penting RUM II"},
+    {num: 673, title: "File Penting RUM III"},
+    {num: 674, title: "File Penting RUM IV"},
+    {num: 701, title: "Organisasi Muncul I"},
+    {num: 702, title: "Organisasi Muncul II"},
+    {num: 703, title: "Organisasi Muncul III"},
+    {num: 704, title: "Organisasi Muncul IV"},
+    {num: 727, title: "Subaru vs Bourbon I"},
+    {num: 728, title: "Subaru vs Bourbon II"},
+    {num: 779, title: "Rumor RUM I"},
+    {num: 780, title: "Rumor RUM II"},
+    {num: 781, title: "Rumor RUM III"},
+    {num: 782, title: "Rumor RUM IV"},
+    {num: 783, title: "Rumor RUM V"},
+    {num: 826, title: "Plot Organisasi I"},
+    {num: 827, title: "Plot Organisasi II"},
+    {num: 836, title: "Penyelidikan Identitas I"},
+    {num: 837, title: "Penyelidikan Identitas II"},
+    {num: 861, title: "Fakta Tentang RUM I"},
+    {num: 862, title: "Fakta Tentang RUM II"},
+    {num: 882, title: "Organisasi Muncul Lagi I"},
+    {num: 883, title: "Organisasi Muncul Lagi II"},
+    {num: 894, title: "RUM Related I"},
+    {num: 895, title: "RUM Related II"},
+    {num: 927, title: "Subaru Fokus I"},
+    {num: 928, title: "Subaru Fokus II"},
+    {num: 941, title: "File Masa Lalu RUM I"},
+    {num: 942, title: "File Masa Lalu RUM II"},
+    {num: 975, title: "File Haibara I"},
+    {num: 976, title: "File Haibara II"},
+    {num: 1003, title: "Perkembangan RUM I"},
+    {num: 1004, title: "Perkembangan RUM II"},
+    {num: 1005, title: "Perkembangan RUM III"},
+    {num: 1025, title: "Drama AI & Organisasi I"},
+    {num: 1026, title: "Drama AI & Organisasi II"},
+    {num: 1033, title: "Pertarungan Organisasi I"},
+    {num: 1034, title: "Pertarungan Organisasi II"},
+    {num: 1035, title: "Pertarungan Organisasi III"},
+    {num: 1071, title: "Menuju Pengungkapan RUM I"},
+  ];
+
+  const tbody = document.getElementById("episodeTableBody");
+  const searchInput = document.getElementById("searchInput");
+
+  function renderTable(filter = "") {
+    tbody.innerHTML = "";
+    const filtered = episodes.filter(e =>
+      e.num.toString().includes(filter) ||
+      e.title.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">Episode tidak ditemukan</td></tr>`;
+      return;
+    }
+
+    filtered.forEach(e => {
+      const watched = localStorage.getItem("conan_episode_" + e.num) === "true";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${e.num}</td>
+        <td>${e.title}</td>
+        <td><label><input type="checkbox" data-episode="${e.num}" ${watched ? "checked" : ""} /> Sudah</label></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  tbody.addEventListener("change", e => {
+    if (e.target.matches("input[type='checkbox']")) {
+      const epNum = e.target.getAttribute("data-episode");
+      localStorage.setItem("conan_episode_" + epNum, e.target.checked);
+    }
+  });
+
+  searchInput.addEventListener("input", () => {
+    renderTable(searchInput.value);
+  });
+
+  renderTable();
+</script>
+
+</body>
+</html>
