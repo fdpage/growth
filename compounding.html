@@ -83,8 +83,8 @@
   <h1>📈 Compounding 10% Tracker</h1>
 
   <div class="form-inputs">
-    <label>Modal Awal (cent): <input type="number" id="modalAwal" value="100" min="1"></label>
-    <label>Target Akhir (cent): <input type="number" id="targetAkhir" value="10000" min="100"></label>
+    <label>Modal Awal (cent): <input type="number" id="modalAwal" min="1"></label>
+    <label>Target Akhir (cent): <input type="number" id="targetAkhir" min="100"></label>
   </div>
 
   <div class="controls">
@@ -97,16 +97,38 @@
   <script>
     const planList = document.getElementById("planList");
     const checklistKey = "compoundingChecklist";
+    const settingKey = "compoundingSettings";
+
+    // Ambil input dan isi dari localStorage jika tersedia
+    const inputModal = document.getElementById("modalAwal");
+    const inputTarget = document.getElementById("targetAkhir");
+
+    function loadSettings() {
+      const saved = JSON.parse(localStorage.getItem(settingKey));
+      if (saved) {
+        inputModal.value = saved.modalAwal;
+        inputTarget.value = saved.targetAkhir;
+      } else {
+        inputModal.value = 100;
+        inputTarget.value = 10000;
+      }
+    }
+
+    function saveSettings(modalAwal, targetAkhir) {
+      localStorage.setItem(settingKey, JSON.stringify({ modalAwal, targetAkhir }));
+    }
 
     function generatePlan() {
-      const modalAwal = parseFloat(document.getElementById("modalAwal").value);
-      const targetAkhir = parseFloat(document.getElementById("targetAkhir").value);
-      const saved = JSON.parse(localStorage.getItem(checklistKey)) || [];
+      const modalAwal = parseFloat(inputModal.value);
+      const targetAkhir = parseFloat(inputTarget.value);
+      const savedChecklist = JSON.parse(localStorage.getItem(checklistKey)) || [];
 
       if (isNaN(modalAwal) || isNaN(targetAkhir) || modalAwal <= 0 || targetAkhir <= modalAwal) {
         alert("❗ Masukkan angka yang valid.");
         return;
       }
+
+      saveSettings(modalAwal, targetAkhir);
 
       let planData = [];
       let current = modalAwal;
@@ -120,12 +142,14 @@
         const day = i + 1;
         const profit = (modal * 0.1).toFixed(2);
         const akhir = (modal * 1.1).toFixed(2);
-        const li = document.createElement("li");
+        const key = `${day}-${modalAwal}-${targetAkhir}`;
+        const isChecked = savedChecklist.includes(key);
 
-        li.className = saved.includes(day + "-" + modalAwal + "-" + targetAkhir) ? "checked" : "";
+        const li = document.createElement("li");
+        li.className = isChecked ? "checked" : "";
         li.innerHTML = `
           <span><strong>Hari ${day}:</strong> Modal ${modal.toFixed(2)} ➜ Profit ${profit} ➜ Total ${akhir}</span>
-          <input type="checkbox" ${li.className ? "checked" : ""} onchange="toggle(${day}, ${modalAwal}, ${targetAkhir})">
+          <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggle(${day}, ${modalAwal}, ${targetAkhir})">
         `;
         planList.appendChild(li);
       });
@@ -133,8 +157,7 @@
 
     function toggle(day, modalAwal, targetAkhir) {
       let saved = JSON.parse(localStorage.getItem(checklistKey)) || [];
-      const key = day + "-" + modalAwal + "-" + targetAkhir;
-
+      const key = `${day}-${modalAwal}-${targetAkhir}`;
       if (saved.includes(key)) {
         saved = saved.filter(k => k !== key);
       } else {
@@ -145,13 +168,16 @@
     }
 
     function resetPlan() {
-      if (confirm("Yakin ingin mereset semua checklist?")) {
+      if (confirm("Yakin ingin mereset semua checklist dan pengaturan?")) {
         localStorage.removeItem(checklistKey);
+        localStorage.removeItem(settingKey);
+        loadSettings();
         generatePlan();
       }
     }
 
     // Inisialisasi awal
+    loadSettings();
     generatePlan();
   </script>
 </body>
