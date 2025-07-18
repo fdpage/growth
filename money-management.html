@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -85,33 +84,31 @@
     tr:nth-child(odd) {
       background-color: #1a3d29;
     }
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #888;
+    }
+    .motivasi {
+      font-style: italic;
+      color: #aaffaa;
+      margin-top: 1.5rem;
+    }
   </style>
 </head>
-<body>
-
-  <div class="top-buttons">
+<body>  <div class="top-buttons">
     <button class="btn-kembali" onclick="window.history.back()">🔙 Kembali</button>
     <button class="btn-reset" onclick="hapusData()">🗑️ Hapus Data</button>
-  </div>
+  </div>  <h1>📊 Kalkulator Money Management</h1><label for="modal">💰 Modal Awal ($):</label> <input type="number" id="modal" value="1000" step="0.01" />
 
-  <h1>📊 Kalkulator Money Management</h1>
+<label for="profit">🎯 Target Profit per Hari (%):</label> <input type="number" id="profit" value="10" step="0.01" />
 
-  <label for="modal">💰 Modal Awal ($):</label>
-  <input type="number" id="modal" value="1000" step="0.01" />
+<label for="hari">📆 Jumlah Hari:</label> <input type="number" id="hari" value="10" />
 
-  <label for="profit">🎯 Target Profit per Hari (%):</label>
-  <input type="number" id="profit" value="10" step="0.01" />
+<label for="tipe">📈 Tipe Pertumbuhan Profit:</label> <select id="tipe"> <option value="biasa">Biasa (tetap)</option> <option value="leverage">Majemuk (bertambah per hari)</option> </select>
 
-  <label for="hari">📆 Jumlah Hari:</label>
-  <input type="number" id="hari" value="10" />
-
-  <label for="tipe">📈 Tipe Pertumbuhan Profit:</label>
-  <select id="tipe">
-    <option value="biasa">Biasa (tetap)</option>
-    <option value="leverage">Majemuk (bertambah per hari)</option>
-  </select>
-
-  <button onclick="hitung()">🧮 Hitung</button>
+<button onclick="hitung()">🧮 Hitung</button>
 
   <table id="hasil" style="display:none">
     <thead>
@@ -125,9 +122,23 @@
       </tr>
     </thead>
     <tbody></tbody>
-  </table>
+  </table>  <div class="motivasi" id="motivasi"></div>  <footer>
+    <button onclick="simpanSemuaData()">💾 Simpan Semua Data</button>
+    <button onclick="hapusSemuaData()">🗑️ Hapus Semua Data</button>
+  </footer>  <script>
+    const motivasiList = [
+      "Jangan menyerah sebelum sukses mengejar kamu!",
+      "Profit bukan tujuan, disiplin adalah jalannya.",
+      "Setiap hari adalah peluang baru.",
+      "Konsisten hari ini = kemenangan besok.",
+      "Lakukan yang terbaik, bukan yang terbanyak."
+    ];
 
-  <script>
+    function tampilkanMotivasi() {
+      const motivasi = motivasiList[Math.floor(Math.random() * motivasiList.length)];
+      document.getElementById('motivasi').innerText = `💡 Motivasi Hari Ini: "${motivasi}"`;
+    }
+
     function formatDolar(angka) {
       return angka.toLocaleString("en-US", {
         minimumFractionDigits: 2,
@@ -149,7 +160,33 @@
     function hapusData() {
       localStorage.removeItem('profitCheckmarks');
       alert('Data centang berhasil dihapus.');
-      hitung(); // refresh hasil agar centang ikut hilang
+      hitung();
+    }
+
+    function simpanSemuaData() {
+      const modal = document.getElementById('modal').value;
+      const profit = document.getElementById('profit').value;
+      const hari = document.getElementById('hari').value;
+      const tipe = document.getElementById('tipe').value;
+      localStorage.setItem('dataMoneyManagement', JSON.stringify({ modal, profit, hari, tipe }));
+      alert('Semua data berhasil disimpan.');
+    }
+
+    function hapusSemuaData() {
+      localStorage.removeItem('dataMoneyManagement');
+      localStorage.removeItem('profitCheckmarks');
+      alert('Semua data berhasil dihapus.');
+      hitung();
+    }
+
+    function muatDataTersimpan() {
+      const data = JSON.parse(localStorage.getItem('dataMoneyManagement'));
+      if (data) {
+        document.getElementById('modal').value = data.modal;
+        document.getElementById('profit').value = data.profit;
+        document.getElementById('hari').value = data.hari;
+        document.getElementById('tipe').value = data.tipe;
+      }
     }
 
     function hitung() {
@@ -186,7 +223,10 @@
 
       document.getElementById('hasil').style.display = 'table';
     }
-  </script>
 
-</body>
+    // Inisialisasi
+    tampilkanMotivasi();
+    muatDataTersimpan();
+    hitung();
+  </script></body>
 </html>
