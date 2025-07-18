@@ -124,10 +124,14 @@
   const textarea = document.getElementById("editableTasks");
   const todayKey = `nativeChecklist-${new Date().toISOString().split('T')[0]}`;
 
-  textarea.value = daftarKegiatan.join("\n");
+  const savedTasks = localStorage.getItem("nativeTasksCustom");
+  textarea.value = savedTasks ? savedTasks : daftarKegiatan.join("\n");
 
   function muatTabel() {
-    daftarKegiatan = textarea.value.split("\n").map(item => item.trim()).filter(item => item);
+    const teks = textarea.value.trim();
+    localStorage.setItem("nativeTasksCustom", teks); // Simpan ke localStorage
+
+    daftarKegiatan = teks.split("\n").map(item => item.trim()).filter(item => item);
     tbody.innerHTML = "";
 
     const savedChecklist = JSON.parse(localStorage.getItem(todayKey)) || [];
