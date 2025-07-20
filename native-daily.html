@@ -77,6 +77,42 @@
       font-weight: bold;
       text-decoration: none;
     }
+    .status-card {
+  background: linear-gradient(135deg, #1b1f1d, #28332f);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  padding: 20px;
+  margin: 30px auto;
+  max-width: 600px;
+  color: #e0ffe1;
+  transition: transform 0.3s ease;
+}
+
+.status-card:hover {
+  transform: scale(1.01);
+}
+
+.status-info {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.status-info h3 {
+  margin: 0.5rem 0;
+  font-size: 20px;
+  color: #c7ffd4;
+}
+
+.status-info p {
+  font-size: 14px;
+  color: #b3ffe0;
+  margin-top: 10px;
+  font-style: italic;
+}
+#userName:focus, #userAvatar:focus {
+  outline: none;
+  border-bottom: 1px dashed #00ff99;
+}
   </style>
 </head>
 <body>
@@ -102,10 +138,54 @@
     <tbody></tbody>
   </table>
 
+<div class="status-card">
   <div id="chartContainer">
     <canvas id="progressChart" height="300"></canvas>
   </div>
+  <div class="status-info">
+    <h3>
+    <span contenteditable="true" id="userAvatar" style="cursor: pointer;">👤</span>
+    <span contenteditable="true" id="userName" style="cursor: text;">Klik untuk edit nama</span>
+  </h3>
+    <h3>Total Poin: <span id="totalPoint">0</span></h3>
+    <h3>Rank: <span id="userRank">🌱 Pemula</span></h3>
+    <p id="motivasi">“Langkah kecil hari ini adalah awal dari kemenangan besar besok.”</p>
+  </div>
+</div>
+
+
 <script>
+  function simpanNamaAvatar() {
+  localStorage.setItem("nativeUserName", document.getElementById("userName").textContent.trim());
+  localStorage.setItem("nativeUserAvatar", document.getElementById("userAvatar").textContent.trim());
+}
+
+function tampilkanNamaAvatar() {
+  const nama = localStorage.getItem("nativeUserName") || "Klik untuk edit nama";
+  const avatar = localStorage.getItem("nativeUserAvatar") || "👤";
+  document.getElementById("userName").textContent = nama;
+  document.getElementById("userAvatar").textContent = avatar;
+}
+
+// Simpan saat user edit
+document.getElementById("userName").addEventListener("blur", simpanNamaAvatar);
+document.getElementById("userAvatar").addEventListener("blur", simpanNamaAvatar);
+
+// Panggil saat inisialisasi
+tampilkanNamaAvatar();
+  function getFullData() {
+    return JSON.parse(localStorage.getItem("nativeDailyFullData")) || {
+      tasksCustom: null,
+      dailyData: [],
+      checklist: {},
+      totalPoint: 0
+    };
+  }
+
+  function saveFullData(data) {
+    localStorage.setItem("nativeDailyFullData", JSON.stringify(data));
+  }
+
   let daftarKegiatan = [
     "Bangun Subuh",
     "Buka Buku & Belajar",
@@ -123,18 +203,19 @@
   const tbody = document.querySelector("#todoTable tbody");
   const textarea = document.getElementById("editableTasks");
   const todayKey = `nativeChecklist-${new Date().toISOString().split('T')[0]}`;
-
-  const savedTasks = localStorage.getItem("nativeTasksCustom");
-  textarea.value = savedTasks ? savedTasks : daftarKegiatan.join("\n");
+  const initialData = getFullData();
+  textarea.value = initialData.tasksCustom || daftarKegiatan.join("\n");
 
   function muatTabel() {
     const teks = textarea.value.trim();
-    localStorage.setItem("nativeTasksCustom", teks); // Simpan ke localStorage
+    const data = getFullData();
+    data.tasksCustom = teks;
+    saveFullData(data);
 
     daftarKegiatan = teks.split("\n").map(item => item.trim()).filter(item => item);
     tbody.innerHTML = "";
 
-    const savedChecklist = JSON.parse(localStorage.getItem(todayKey)) || [];
+    const savedChecklist = data.checklist[todayKey] || [];
 
     daftarKegiatan.forEach((item, i) => {
       const tr = document.createElement("tr");
@@ -144,13 +225,15 @@
       `;
       tbody.appendChild(tr);
 
-      // Tambahkan event untuk update localStorage ketika status berubah
       document.getElementById(`kegiatan-${i}`).addEventListener('change', () => {
         const checkedIndexes = daftarKegiatan.map((_, j) => {
           const el = document.getElementById(`kegiatan-${j}`);
           return el && el.checked ? j : null;
         }).filter(index => index !== null);
-        localStorage.setItem(todayKey, JSON.stringify(checkedIndexes));
+
+        const updated = getFullData();
+        updated.checklist[todayKey] = checkedIndexes;
+        saveFullData(updated);
       });
     });
   }
@@ -158,16 +241,26 @@
   function simpanData() {
     const hariIni = new Date().toISOString().split('T')[0];
     let skor = 0;
+
     daftarKegiatan.forEach((_, i) => {
       if (document.getElementById(`kegiatan-${i}`).checked) skor++;
     });
 
-    const data = JSON.parse(localStorage.getItem("nativeDailyData")) || [];
-    const existingIndex = data.findIndex(d => d.tanggal === hariIni);
-    if (existingIndex !== -1) data.splice(existingIndex, 1); // hapus data duplikat
-    data.push({ tanggal: hariIni, skor });
-    localStorage.setItem("nativeDailyData", JSON.stringify(data));
-    tampilkanGrafik(data);
+    const data = getFullData();
+    const existingIndex = data.dailyData.findIndex(d => d.tanggal === hariIni);
+    if (existingIndex !== -1) data.dailyData.splice(existingIndex, 1);
+
+    data.dailyData.push({ tanggal: hariIni, skor });
+
+    // ✅ Hitung total poin dan simpan
+    const total = data.dailyData.reduce((sum, entry) => sum + entry.skor, 0);
+    data.totalPoint = total;
+
+    saveFullData(data);
+
+    tampilkanGrafik(data.dailyData);
+    hitungTotalPoin();
+
     alert("✅ Data berhasil disimpan!");
   }
 
@@ -203,20 +296,60 @@
     });
   }
 
-  function hapusSemua() {
-    if (confirm("⚠️ Yakin ingin menghapus semua data yang tersimpan?")) {
-      localStorage.removeItem("nativeDailyData");
-      localStorage.removeItem(todayKey);
-      if (window.grafik) window.grafik.destroy();
-      alert("🗑️ Data berhasil dihapus!");
-      muatTabel();
+  function hitungTotalPoin() {
+    const data = getFullData();
+    const total = data.totalPoint || 0;
+    document.getElementById("totalPoint").textContent = total;
+    tampilkanRank(total);
+  }
+
+  function tampilkanRank(totalPoin) {
+  const ranks = [
+    { min: 0, rank: "🌱 Pemula", motivasi: "“Langkah kecil hari ini adalah awal dari kemenangan besar besok.” – Unknown" },
+    { min: 10, rank: "💪 Pelatih Diri", motivasi: "“Orang hebat tak dilahirkan, mereka ditempa.” – Cristiano Ronaldo" },
+    { min: 20, rank: "🔥 Pejuang", motivasi: "“Jangan menyerah, menderitalah sekarang dan hiduplah sebagai juara selamanya.” – Muhammad Ali" },
+    { min: 35, rank: "🚀 Pendaki", motivasi: "“Keberhasilan bukanlah kebetulan.” – Pele" },
+    { min: 50, rank: "🧠 Master", motivasi: "“Keunggulan adalah hasil dari kebiasaan, bukan tindakan sesekali.” – Aristoteles" },
+    { min: 70, rank: "⚔️ Penantang", motivasi: "“Uji dirimu di medan sulit untuk menjadi lebih kuat.” – Bruce Lee" },
+    { min: 100, rank: "🌟 Juara", motivasi: "“Jadilah dirimu yang terbaik.” – John Wooden" },
+    { min: 150, rank: "👑 Raja Disiplin", motivasi: "“Disiplin adalah jembatan antara tujuan dan pencapaian.” – Jim Rohn" },
+    { min: 200, rank: "💎 Elite", motivasi: "“Ketekunan mengalahkan bakat.” – Angela Duckworth" },
+    { min: 300, rank: "🦾 Titan", motivasi: "“Kesuksesan adalah milik mereka yang pantang menyerah.” – Tony Robbins" },
+    { min: 500, rank: "🌌 Legenda", motivasi: "“Orang yang cukup gila untuk berpikir dia bisa mengubah dunia adalah orang yang melakukannya.” – Steve Jobs" },
+    { min: 750, rank: "🚨 Mythical", motivasi: "“Kebiasaan membentuk karakter, dan karakter menentukan nasib.” – Warren Buffett" },
+    { min: 1000, rank: "⚡ Immortal", motivasi: "“Kemenangan terbesar adalah menaklukkan diri sendiri.” – Plato" }
+  ];
+
+  // Cari rank tertinggi yang sesuai
+  let currentRank = ranks[0];
+  for (let i = 0; i < ranks.length; i++) {
+    if (totalPoin >= ranks[i].min) {
+      currentRank = ranks[i];
+    } else {
+      break;
     }
   }
 
-  // Inisialisasi
+  // Tampilkan hasil
+  document.getElementById("userRank").textContent = currentRank.rank;
+  const motivasiEl = document.getElementById("motivasi");
+  if (motivasiEl) motivasiEl.textContent = currentRank.motivasi;
+}
+
+  function hapusSemua() {
+    if (confirm("⚠️ Yakin ingin menghapus semua data yang tersimpan?")) {
+      localStorage.removeItem("nativeDailyFullData");
+      if (window.grafik) window.grafik.destroy();
+      alert("🗑️ Data berhasil dihapus!");
+      location.reload();
+    }
+  }
+
+  // 🔄 Inisialisasi
   muatTabel();
-  const dataLama = JSON.parse(localStorage.getItem("nativeDailyData")) || [];
+  const dataLama = getFullData().dailyData;
   if (dataLama.length > 0) tampilkanGrafik(dataLama);
+  hitungTotalPoin(); // ⬅️ Pastikan dipanggil di awal
 </script>
 </body>
 </html>
