@@ -162,7 +162,16 @@
   </table>
 
 <script>
-  
+  function setChartWarningVisibility(visible) {
+  const el = document.getElementById('chartWarning');
+  el.style.display = visible ? 'block' : 'none';
+  localStorage.setItem('chartWarningVisible', visible ? 'true' : 'false');
+}
+
+function applyChartWarningFromStorage() {
+  const visible = localStorage.getItem('chartWarningVisible');
+  setChartWarningVisibility(visible === null || visible === 'true');
+}
   function simpanNamaAvatar() {
   localStorage.setItem("nativeUserName", document.getElementById("userName").textContent.trim());
   localStorage.setItem("nativeUserAvatar", document.getElementById("userAvatar").textContent.trim());
@@ -270,7 +279,7 @@ tampilkanNamaAvatar();
     hitungTotalPoin();
 
     alert("✅ Data berhasil disimpan!");
-    document.getElementById('chartWarning').style.display = 'none';
+    setChartWarningVisibility(false);
   }
 
   function tampilkanGrafik(data) {
@@ -348,17 +357,20 @@ tampilkanNamaAvatar();
   function hapusSemua() {
     if (confirm("⚠️ Yakin ingin menghapus semua data yang tersimpan?")) {
       localStorage.removeItem("nativeDailyFullData");
+      localStorage.setItem('chartWarningVisible', 'true');
       if (window.grafik) window.grafik.destroy();
       alert("🗑️ Data berhasil dihapus!");
       location.reload();
     }
   }
 
-  // 🔄 Inisialisasi
-  muatTabel();
-  const dataLama = getFullData().dailyData;
-  if (dataLama.length > 0) tampilkanGrafik(dataLama);
-  hitungTotalPoin(); // ⬅️ Pastikan dipanggil di awal
+// 🔄 Inisialisasi
+muatTabel();
+const dataLama = getFullData().dailyData;
+if (dataLama.length > 0) tampilkanGrafik(dataLama);
+hitungTotalPoin();
+applyChartWarningFromStorage(); // ⬅️ Tambahan baru
+  
 </script>
 </body>
 </html>
