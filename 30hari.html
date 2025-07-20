@@ -14,7 +14,7 @@
     h1 {
       color: #00ff99;
       font-size: 2rem;
-      margin-bottom: 1rem;
+       margin-bottom: 1rem;
       text-align: center;
     }
     .btn-group {
@@ -96,20 +96,22 @@
   </div>
 
   <h1>🔥 30 Hari Disiplin</h1>
+
   <form id="disiplinForm">
     <label for="tanggal">Tanggal:</label>
     <input type="date" id="tanggal" required>
 
     <label for="tugas">Tugas / Target Disiplin Hari Ini:</label>
-    <input type="text" id="tugas" placeholder="cth: Bangun jam 5 pagi, tidak FOMO trade" required>
+    <input type="text" id="tugas" required placeholder="cth: Bangun jam 5 pagi">
 
     <label for="evaluasi">Evaluasi:</label>
-    <textarea id="evaluasi" rows="3" placeholder="cth: Berhasil bangun pagi, tapi FOMO sedikit" required></textarea>
+    <textarea id="evaluasi" rows="3" required placeholder="cth: Sukses bangun, tapi masih scrolling sebelum tidur."></textarea>
 
     <label for="status">Status:</label>
-    <select id="status" required>
-      <option value="✅ Disiplin">✅ Disiplin</option>
-      <option value="⚠️ Gagal">⚠️ Gagal</option>
+<select id="status" required>
+  <option value="✅ Disiplin">✅ Disiplin</option>
+  <option value="⚠️ Gagal">⚠️ Gagal</option>
+  <option value="🔄 Proses">🔄 Proses</option>
     </select>
 
     <button type="submit">Simpan Evaluasi</button>
@@ -128,31 +130,34 @@
     <tbody></tbody>
   </table>
 
+  <footer style="margin-top: 2rem;">
+    <p id="motivasi"></p>
+  </footer>
+
   <script>
     const form = document.getElementById("disiplinForm");
     const tbody = document.querySelector("#tabelDisiplin tbody");
+    let dataDisiplin = JSON.parse(localStorage.getItem("dataDisiplin")) || [];
 
-    // Load data saat awal
+    // Load awal
     window.onload = function() {
-      const data = JSON.parse(localStorage.getItem("dataDisiplin")) || [];
-      data.forEach((item, index) => tambahBaris(item, index + 1));
+      tbody.innerHTML = "";
+      dataDisiplin.forEach((data, index) => tambahBaris(data, index + 1));
+      tampilkanMotivasi();
     };
 
+    // Submit form
     form.addEventListener("submit", function(e) {
       e.preventDefault();
-
       const data = {
         tanggal: document.getElementById("tanggal").value,
         tugas: document.getElementById("tugas").value,
         evaluasi: document.getElementById("evaluasi").value,
-        status: document.getElementById("status").value
+        status: document.getElementById("status").value,
       };
-
-      const allData = JSON.parse(localStorage.getItem("dataDisiplin")) || [];
-      allData.push(data);
-      localStorage.setItem("dataDisiplin", JSON.stringify(allData));
-
-      tambahBaris(data, allData.length);
+      dataDisiplin.push(data);
+      simpanLocal();
+      tambahBaris(data, dataDisiplin.length);
       form.reset();
     });
 
@@ -163,16 +168,44 @@
         <td>${data.tanggal}</td>
         <td>${data.tugas}</td>
         <td>${data.evaluasi}</td>
-        <td>${data.status}</td>
+        <td>
+          <select onchange="ubahStatus(${hariKe - 1}, this.value)">
+  <option value="✅ Disiplin" ${data.status === "✅ Disiplin" ? "selected" : ""}>✅ Disiplin</option>
+  <option value="⚠️ Gagal" ${data.status === "⚠️ Gagal" ? "selected" : ""}>⚠️ Gagal</option>
+  <option value="🔄 Proses" ${data.status === "🔄 Proses" ? "selected" : ""}>🔄 Proses</option>
+</select>
+        </td>
       `;
       tbody.appendChild(row);
     }
 
+    function ubahStatus(index, statusBaru) {
+      dataDisiplin[index].status = statusBaru;
+      simpanLocal();
+    }
+
+    function simpanLocal() {
+      localStorage.setItem("dataDisiplin", JSON.stringify(dataDisiplin));
+    }
+
     function hapusSemua() {
-      if (confirm("Apakah kamu yakin ingin menghapus semua data disiplin 30 hari?")) {
-        localStorage.removeItem("dataDisiplin");
+      if (confirm("Hapus semua data disiplin?")) {
+        dataDisiplin = [];
+        simpanLocal();
         tbody.innerHTML = "";
       }
+    }
+
+    function tampilkanMotivasi() {
+      const motivasiList = [
+        "Setiap hari adalah kesempatan baru!",
+        "Kamu lebih kuat dari godaan hari ini!",
+        "Jangan tunggu motivasi, jadilah disiplin!",
+        "Konsistensi kecil = hasil besar.",
+        "Lawan FOMO dengan tujuan jangka panjang."
+      ];
+      const random = motivasiList[Math.floor(Math.random() * motivasiList.length)];
+      document.getElementById("motivasi").innerText = `💡 Motivasi hari ini: "${random}"`;
     }
   </script>
 </body>
