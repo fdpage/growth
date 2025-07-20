@@ -18,19 +18,32 @@
       margin-bottom: 1rem;
     }
     .btn-container {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
     button {
-      background-color: #00ff99;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      margin: 0.5rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+  background-color: #00ff99;
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  margin: 0.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  min-width: 200px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 255, 153, 0.2);
+}
+
+button:hover {
+  background-color: #00e68a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 255, 153, 0.3);
+}
     table {
       width: 100%;
       border-collapse: collapse;
@@ -120,6 +133,51 @@
   font-style: italic;
   font-size: 1rem;
 }
+.modal-overlay {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.modal-box {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  margin: 10% auto;
+  color: #e0ffe1;
+  position: relative;
+}
+
+.modal-box textarea {
+  width: 100%;
+  height: 180px;
+  margin-top: 10px;
+  background-color: #111;
+  color: #e0ffe1;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.modal-box button {
+  margin-top: 1rem;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px; right: 15px;
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
   </style>
 </head>
 <body>
@@ -142,11 +200,22 @@
     <p id="motivasi">“Langkah kecil hari ini adalah awal dari kemenangan besar besok.”</p>
   </div>
 </div>
-  <label for="editableTasks">📝 Edit To-Do List (1 per baris):</label>
-  <textarea id="editableTasks"></textarea>
+  <div class="btn-container">
+  <button onclick="bukaPopupEdit()">✏️ Edit To-Do List</button>
+</div>
+
+<!-- Popup Modal -->
+<div class="modal-overlay" id="popupEdit">
+  <div class="modal-box">
+    <h3>📝 Edit To-Do List (1 per baris)</h3>
+    <textarea id="editableTasks"></textarea>
+    <div class="btn-container">
+      <button onclick="simpanDanTutup()">💾 Simpan & Tutup</button>
+    </div>
+  </div>
+</div>
   
   <div class="btn-container">
-    <button onclick="muatTabel()">🔄 Muat Ulang Tabel</button>
     <button onclick="simpanData()">💾 Simpan Hari Ini</button>
     <button onclick="hapusSemua()">🗑️ Hapus Semua Data</button>
   </div>
@@ -162,6 +231,20 @@
   </table>
 
 <script>
+  function bukaPopupEdit() {
+  const data = getFullData();
+  document.getElementById("editableTasks").value = data.tasksCustom || daftarKegiatan.join("\n");
+  document.getElementById("popupEdit").style.display = "block";
+}
+
+function tutupPopupEdit() {
+  document.getElementById("popupEdit").style.display = "none";
+}
+
+function simpanDanTutup() {
+  muatTabel(); // otomatis simpan textarea
+  tutupPopupEdit();
+}
   function setChartWarningVisibility(visible) {
   const el = document.getElementById('chartWarning');
   el.style.display = visible ? 'block' : 'none';
