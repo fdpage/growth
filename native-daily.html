@@ -113,12 +113,35 @@
   outline: none;
   border-bottom: 1px dashed #00ff99;
 }
+#chartWarning {
+  text-align: center;
+  margin: 0 auto;
+  color: #ccc;
+  font-style: italic;
+  font-size: 1rem;
+}
   </style>
 </head>
 <body>
   <a class="btn-back" href="index.html">⬅️ Kembali</a>
   <h1>✅ Native Daily Tracker</h1>
-
+<div class="status-card">
+  <div id="chartContainer">
+    <p id="chartWarning" style="text-align:center; color:#ccc; font-style:italic;">
+  📉 Belum ada data skor untuk ditampilkan. Simpan aktivitas harian untuk melihat grafik!
+</p>
+    <canvas id="progressChart" height="300"></canvas>
+  </div>
+  <div class="status-info">
+    <h3>
+    <span contenteditable="true" id="userAvatar" style="cursor: pointer;">👤</span>
+    <span contenteditable="true" id="userName" style="cursor: text;">Klik untuk edit nama</span>
+  </h3>
+    <h3>Total Poin: <span id="totalPoint">0</span></h3>
+    <h3>Rank: <span id="userRank">🌱 Pemula</span></h3>
+    <p id="motivasi">“Langkah kecil hari ini adalah awal dari kemenangan besar besok.”</p>
+  </div>
+</div>
   <label for="editableTasks">📝 Edit To-Do List (1 per baris):</label>
   <textarea id="editableTasks"></textarea>
   
@@ -138,23 +161,8 @@
     <tbody></tbody>
   </table>
 
-<div class="status-card">
-  <div id="chartContainer">
-    <canvas id="progressChart" height="300"></canvas>
-  </div>
-  <div class="status-info">
-    <h3>
-    <span contenteditable="true" id="userAvatar" style="cursor: pointer;">👤</span>
-    <span contenteditable="true" id="userName" style="cursor: text;">Klik untuk edit nama</span>
-  </h3>
-    <h3>Total Poin: <span id="totalPoint">0</span></h3>
-    <h3>Rank: <span id="userRank">🌱 Pemula</span></h3>
-    <p id="motivasi">“Langkah kecil hari ini adalah awal dari kemenangan besar besok.”</p>
-  </div>
-</div>
-
-
 <script>
+  
   function simpanNamaAvatar() {
   localStorage.setItem("nativeUserName", document.getElementById("userName").textContent.trim());
   localStorage.setItem("nativeUserAvatar", document.getElementById("userAvatar").textContent.trim());
@@ -262,6 +270,7 @@ tampilkanNamaAvatar();
     hitungTotalPoin();
 
     alert("✅ Data berhasil disimpan!");
+    document.getElementById('chartWarning').style.display = 'none';
   }
 
   function tampilkanGrafik(data) {
