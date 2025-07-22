@@ -421,20 +421,32 @@ tampilkanNamaAvatar();
     { min: 1000, rank: "⚡ Immortal", motivasi: "“Kemenangan terbesar adalah menaklukkan diri sendiri.” – Plato" }
   ];
 
-  // Cari rank tertinggi yang sesuai
   let currentRank = ranks[0];
+  let nextRank = null;
+
   for (let i = 0; i < ranks.length; i++) {
     if (totalPoin >= ranks[i].min) {
       currentRank = ranks[i];
+      nextRank = ranks[i + 1] || null;
     } else {
       break;
     }
   }
 
-  // Tampilkan hasil
   document.getElementById("userRank").textContent = currentRank.rank;
   const motivasiEl = document.getElementById("motivasi");
   if (motivasiEl) motivasiEl.textContent = currentRank.motivasi;
+
+  // ➕ Tambahkan info poin menuju rank berikutnya
+  let infoTambahan = "";
+  if (nextRank) {
+    const sisa = nextRank.min - totalPoin;
+    infoTambahan = `<br><span style="color:#aaffcc">🎯 ${sisa} poin lagi menuju <b>${nextRank.rank}</b></span>`;
+  } else {
+    infoTambahan = `<br><span style="color:#ffd700">🏆 Kamu sudah mencapai rank tertinggi!</span>`;
+  }
+
+  motivasiEl.innerHTML += infoTambahan;
 }
 
   function hapusSemua() {
