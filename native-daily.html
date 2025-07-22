@@ -363,6 +363,12 @@ tampilkanNamaAvatar();
 
     alert("✅ Data berhasil disimpan!");
     setChartWarningVisibility(false);
+    
+    // Reset semua checkbox setelah disimpan
+daftarKegiatan.forEach((_, i) => {
+  const checkbox = document.getElementById(`kegiatan-${i}`);
+  if (checkbox) checkbox.checked = false;
+});
   }
 
   function tampilkanGrafik(data) {
@@ -468,4 +474,4 @@ applyChartWarningFromStorage(); // ⬅️ Tambahan baru
   
 </script>
 </body>
-</html>
+  </html>
