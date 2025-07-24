@@ -519,10 +519,152 @@ form.search-form {
   color: #38bdf8;
   text-decoration: none;
 }
+.motivasi-kasar {
+  font-weight: 500;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.highlight-poor,
+.highlight-rich,
+.highlight-no,
+.highlight-transformation {
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* Tema Hutan */
+.theme-hutan .highlight-poor { color: #ff4d4d; }
+.theme-hutan .highlight-rich { color: #00ff99; }
+.theme-hutan .highlight-no { color: #ff4d4d; }
+.theme-hutan .highlight-transformation { color: #00cc66; }
+
+/* Tema Langit */
+.theme-langit .highlight-poor { color: #cc3300; }
+.theme-langit .highlight-rich { color: #0099cc; }
+.theme-langit .highlight-no { color: #cc3300; }
+.theme-langit .highlight-transformation { color: #006688; }
+
+/* Tema Senja */
+.theme-senja .highlight-poor { color: #cc4444; }
+.theme-senja .highlight-rich { color: #e07a5f; }
+.theme-senja .highlight-no { color: #cc4444; }
+.theme-senja .highlight-transformation { color: #f4a261; }
+
+/* Tema Malam */
+.theme-malam .highlight-poor { color: #f87171; }
+.theme-malam .highlight-rich { color: #38bdf8; }
+.theme-malam .highlight-no { color: #ef4444; }
+.theme-malam .highlight-transformation { color: #60a5fa; }
+#popup-iklan {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-overlay {
+  position: absolute;
+  background: rgba(0,0,0,0.6);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.popup-content {
+  background-color: #ccffcc;
+  padding: 1.5rem;
+  border-radius: 10px;
+  max-width: 350px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #004d26;
+}
+
+.popup-button, .popup-download {
+  display: block;
+  margin: 0.5rem auto;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #00994d;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.popup-download:hover {
+  background-color: #00cc66;
+}
+
+.popup-button {
+  padding: 10px 16px;
+  border: none;
+  background-color: #00cc66;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.popup-button:hover {
+  background-color: #00e673;
+}
+.popup-text {
+  color: #00331a;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+.popup-image {
+  max-width: 100%;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  border: 3px solid #00cc66; /* warna hijau terang */
+  box-shadow: 0 0 10px rgba(0, 204, 102, 0.3); /* efek glow lembut */
+}
 </style>
 </head>
 <body class="theme-hutan">
+<div id="popup-iklan" style="display:none;">
+  <div class="popup-overlay"></div>
+  <div class="popup-content">
+    <button class="popup-close" onclick="hidePopup()">✕</button>
+    <img id="popup-img" src="" alt="Iklan" class="popup-image">
+    <p id="popup-text" class="popup-text"></p>
+    <a id="popup-download" class="popup-download" href="#" target="_blank">⬇️ Download Sekarang</a>
+    <button onclick="closePopupPermanen()" class="popup-button">Jangan tampilkan lagi</button>
+  </div>
+</div>
+
   <div class="growth-title">Growth App</div>
+  <div class="motivasi-kasar">
+  <p><span class="highlight-no">No Testosteron</span>, <span class="highlight-transformation">No Transformation</span></p>
+    <p><span class="highlight-poor">Poor Work</span>, <span class="highlight-rich">Rich Leverage</span></p>
+</div>
   <form onsubmit="handleSearch(event)" class="search-form">
   <div class="form-row">
     <input id="search-input" type="text" placeholder="Cari sesuatu..." required />
@@ -539,7 +681,6 @@ form.search-form {
 </form>
 
   <h1>Dashboard For Growth</h1>
-
 <div class="grid" id="widget-grid"></div>
 <!-- Tombol + Tambah Widget -->
 <button onclick="toggleWidgetForm()">➕ Tambah Pintasan</button>
@@ -758,6 +899,62 @@ if (!widgetData || widgetData.length === 0) {
     window.open(url, '_blank');
   }
 </script>
+<!--Iklan -->
+<script>
+  function showPopupIfNeeded() {
+    const popupSeen = localStorage.getItem("popupTertutup");
+    if (!popupSeen) {
+      document.getElementById("popup-iklan").style.display = "flex";
+    }
+  }
+
+  function hidePopup() {
+    // hanya sembunyikan sementara
+    document.getElementById("popup-iklan").style.display = "none";
+  }
+
+  function closePopupPermanen() {
+    localStorage.setItem("popupTertutup", "true");
+    document.getElementById("popup-iklan").style.display = "none";
+  }
+
+  window.addEventListener("DOMContentLoaded", showPopupIfNeeded);
+  
+  const iklanList = [
+    {
+      img: "iklanapp.gif",
+      teks: "🚀 Mulai hidup disiplin dan produktif bersama Growth App!",
+      link: "#"
+    },
+  ];
+
+  function showPopupIfNeeded() {
+    const popupSeen = localStorage.getItem("popupTertutup");
+    if (popupSeen) return;
+
+    // Pilih iklan secara acak
+    const iklan = iklanList[Math.floor(Math.random() * iklanList.length)];
+
+    // Tampilkan isi ke elemen popup
+    document.getElementById("popup-img").src = iklan.img;
+    document.getElementById("popup-text").innerText = iklan.teks;
+    document.getElementById("popup-download").href = iklan.link;
+
+    document.getElementById("popup-iklan").style.display = "flex";
+  }
+
+  function hidePopup() {
+    document.getElementById("popup-iklan").style.display = "none";
+  }
+
+  function closePopupPermanen() {
+    localStorage.setItem("popupTertutup", "true");
+    hidePopup();
+  }
+
+  window.addEventListener("DOMContentLoaded", showPopupIfNeeded);
+</script>
+
 <!-- Footer -->
 <footer class="footer">
   By <a href="https://fandportofolio.netlify.app/" target="_blank">Fandev</a>
