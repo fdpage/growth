@@ -646,6 +646,14 @@ form.search-form {
   border: 3px solid #00cc66; /* warna hijau terang */
   box-shadow: 0 0 10px rgba(0, 204, 102, 0.3); /* efek glow lembut */
 }
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.popup-content {
+  animation: fadeIn 0.6s ease-in-out;
+}
 </style>
 </head>
 <body class="theme-hutan">
@@ -662,8 +670,8 @@ form.search-form {
 
   <div class="growth-title">Growth App</div>
   <div class="motivasi-kasar">
-  <p><span class="highlight-no">No Testosteron</span>, <span class="highlight-transformation">No Transformation</span></p>
-    <p><span class="highlight-poor">Poor Work</span>, <span class="highlight-rich">Rich Leverage</span></p>
+    <p><span class="highlight-poor">Success Is A Journey</span>, <span class="highlight-rich">Not A Destination</span></p>
+    <p><span class="highlight-no">No Testosteron</span>, <span class="highlight-transformation">No Transformation</span></p>
 </div>
   <form onsubmit="handleSearch(event)" class="search-form">
   <div class="form-row">
@@ -736,12 +744,10 @@ let widgetData = JSON.parse(localStorage.getItem("dashboardWidgets"));
 
 if (!widgetData || widgetData.length === 0) {
   widgetData = [
-    { icon: "💰", label: "Keuangan", link: "keuangan.html" },
     { icon: "🏋️", label: "Kebugaran", link: "kebugaran.html" },
     { icon: "📋", label: "Native Daily", link: "native-daily.html" },
     { icon: "📅", label: "30 Hari Disiplin", link: "30hari.html" },
-    { icon: "📒", label: "Note For Day", link: "note.html" },
-    { icon: "🕵", label: "Conan Non Filler", link: "conan-tracker.html" }
+    { icon: "📒", label: "Note For Day", link: "note.html" }
   ];
   localStorage.setItem("dashboardWidgets", JSON.stringify(widgetData));
 }
@@ -901,63 +907,54 @@ if (!widgetData || widgetData.length === 0) {
 </script>
 <!--Iklan -->
 <script>
-  function showPopupIfNeeded() {
-    const popupSeen = localStorage.getItem("popupTertutup");
-    if (!popupSeen) {
-      document.getElementById("popup-iklan").style.display = "flex";
-    }
-  }
-
-  function hidePopup() {
-    // hanya sembunyikan sementara
-    document.getElementById("popup-iklan").style.display = "none";
-  }
-
-  function closePopupPermanen() {
-    localStorage.setItem("popupTertutup", "true");
-    document.getElementById("popup-iklan").style.display = "none";
-  }
-
-  window.addEventListener("DOMContentLoaded", showPopupIfNeeded);
-  
   const iklanList = [
     {
       img: "iklanapp.gif",
       teks: "🚀 Mulai hidup disiplin dan produktif bersama Growth App!",
       link: "#"
-    },
+    }
   ];
 
   function showPopupIfNeeded() {
-    const popupSeen = localStorage.getItem("popupTertutup");
-    if (popupSeen) return;
+    const lastClosed = localStorage.getItem("popupTerakhirDitutup");
+    const now = new Date().getTime();
 
-    // Pilih iklan secara acak
-    const iklan = iklanList[Math.floor(Math.random() * iklanList.length)];
+    // Jika belum pernah ditutup atau sudah lewat 1 jam (3600000 ms)
+    if (!lastClosed || now - parseInt(lastClosed) > 300000) {
+      const iklan = iklanList[Math.floor(Math.random() * iklanList.length)];
+      document.getElementById("popup-img").src = iklan.img;
+      document.getElementById("popup-text").innerText = iklan.teks;
+      document.getElementById("popup-download").href = iklan.link;
 
-    // Tampilkan isi ke elemen popup
-    document.getElementById("popup-img").src = iklan.img;
-    document.getElementById("popup-text").innerText = iklan.teks;
-    document.getElementById("popup-download").href = iklan.link;
-
-    document.getElementById("popup-iklan").style.display = "flex";
+      // Tampilkan popup dengan delay 3 detik
+      setTimeout(() => {
+        document.getElementById("popup-iklan").style.display = "flex";
+      }, 1000);
+    }
   }
 
   function hidePopup() {
+    localStorage.setItem("popupTerakhirDitutup", new Date().getTime().toString());
     document.getElementById("popup-iklan").style.display = "none";
   }
 
   function closePopupPermanen() {
+    // Tampilkan iklan tidak akan pernah lagi
     localStorage.setItem("popupTertutup", "true");
-    hidePopup();
+    document.getElementById("popup-iklan").style.display = "none";
   }
 
-  window.addEventListener("DOMContentLoaded", showPopupIfNeeded);
+  window.addEventListener("DOMContentLoaded", () => {
+    const permanen = localStorage.getItem("popupTertutup");
+    if (!permanen) {
+      showPopupIfNeeded();
+    }
+  });
 </script>
 
 <!-- Footer -->
 <footer class="footer">
-  By <a href="https://fandportofolio.netlify.app/" target="_blank">Fandev</a>
+  ©2025 - <a href="https://growthid.vercel.app/" target="_blank">Fandev</a>
 </footer>
 </body>
 </html>
