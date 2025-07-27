@@ -6,6 +6,33 @@
   <title>Native Daily Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+  .export-import-container {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.export-import-container button {
+  background-color: #004d33;
+  color: #aaffcc;
+  border: 1px solid #00ff99;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 255, 153, 0.1);
+  transition: all 0.3s ease;
+}
+
+.export-import-container button:hover {
+  background-color: #00664d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 255, 153, 0.25);
+}
     body {
       background-color: #0f0f0f;
       color: #e0ffe1;
@@ -269,7 +296,11 @@ button:hover {
     </thead>
     <tbody></tbody>
   </table>
-
+<div class="export-import-container">
+  <button onclick="eksporData()">⬇️ Ekspor Data</button>
+  <input type="file" id="fileInput" style="display:none" onchange="imporData(event)">
+  <button onclick="document.getElementById('fileInput').click()">⬆️ Impor Data</button>
+</div>
 <script>
   function bukaPopupEdit() {
   const data = getFullData();
