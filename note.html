@@ -124,19 +124,21 @@
     const storageKey = "notesData";
     const noteList = document.getElementById("noteList");
 
-    function loadNotes() {
-      const savedNotes = JSON.parse(localStorage.getItem(storageKey)) || [];
-      noteList.innerHTML = "";
-      savedNotes.forEach((note, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <div><strong>📅 ${note.date}</strong> | <span class="type-label">${note.type}</span></div>
-          <p>${note.text}</p>
-          <button class="delete-btn" onclick="deleteNote(${index})">Hapus</button>
-        `;
-        noteList.appendChild(li);
-      });
-    }
+function loadNotes() {
+  const savedNotes = JSON.parse(localStorage.getItem(storageKey)) || [];
+  noteList.innerHTML = "";
+  // Tampilkan note terbaru di atas
+  savedNotes.slice().reverse().forEach((note, index) => {
+    const realIndex = savedNotes.length - 1 - index; // index asli di array
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div><strong>📅 ${note.date}</strong> | <span class="type-label">${note.type}</span></div>
+      <p>${note.text}</p>
+      <button class="delete-btn" onclick="deleteNote(${realIndex})">Hapus</button>
+    `;
+    noteList.appendChild(li);
+  });
+}
 
     function addNote() {
       const date = document.getElementById("noteDate").value;
