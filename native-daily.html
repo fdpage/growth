@@ -282,9 +282,9 @@ button:hover {
   </div>
 </div>
   
-  <div class="btn-container">
-    <button onclick="simpanData()">💾 Simpan Hari Ini</button>
-    <button onclick="hapusSemua()">🗑️ Hapus Semua Data</button>
+<div class="btn-container">
+  <button onclick="simpanData()">💾 Simpan Hari Ini</button>
+  <button onclick="hapusSemua()">🗑️ Hapus Semua Data</button>
   </div>
 
   <table id="todoTable">
@@ -296,10 +296,10 @@ button:hover {
     </thead>
     <tbody></tbody>
   </table>
-<div class="export-import-container">
-  <button onclick="eksporData()">⬇️ Ekspor Data</button>
-  <input type="file" id="fileInput" style="display:none" onchange="imporData(event)">
-  <button onclick="document.getElementById('fileInput').click()">⬆️ Impor Data</button>
+  
+  <div class="btn-container">
+  <button onclick="copyData()">📋 Copy Data</button>
+  <button onclick="pasteData()">📥 Paste Data</button>
 </div>
 <script>
   function bukaPopupEdit() {
@@ -583,6 +583,38 @@ applyChartWarningFromStorage(); // ⬅️ Tambahan baru
 
 function tutupPopupHistory() {
   document.getElementById("popupHistory").style.display = "none";
+}
+
+function copyData() {
+  const data = localStorage.getItem("nativeDailyFullData");
+  if (!data) return alert("❌ Tidak ada data untuk dicopy!");
+  navigator.clipboard.writeText(data).then(() => {
+    alert("✅ Data berhasil dicopy ke clipboard!");
+  }).catch(err => {
+    alert("⚠️ Gagal menyalin data: " + err);
+  });
+}
+
+function pasteData() {
+  const input = prompt("📥 Tempel data hasil copy sebelumnya di sini:");
+
+  if (!input) {
+    alert("❌ Tidak ada data yang ditempel.");
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(input);
+    if (parsed && typeof parsed === "object") {
+      localStorage.setItem("nativeDailyFullData", JSON.stringify(parsed));
+      alert("✅ Data berhasil dipulihkan!");
+      location.reload();
+    } else {
+      alert("❌ Format data tidak valid!");
+    }
+  } catch (e) {
+    alert("❌ Gagal memproses data! Pastikan data valid JSON.");
+  }
 }
 </script>
 </body>
