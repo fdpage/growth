@@ -694,7 +694,8 @@ form.search-form {
 <button onclick="toggleWidgetForm()">➕ Tambah Pintasan</button>
 <!-- Tombol Ganti Tema -->
 <button onclick="switchTheme()" id="theme-button" style="margin-top: 1rem;">🎨 Ganti Tema</button>
-
+<!-- Tombol Ganti Bahasa -->
+<button onclick="switchLanguage()" id="lang-button" style="margin-top: 0.5rem;">🌐 Ganti Bahasa</button>
 <!-- Form Input Tambah/Edit -->
 <div id="widget-form" style="display:none; margin-top:1rem; max-width:600px; width:100%;">
   <input type="text" id="widget-icon" placeholder="Emoji/Icon misalnya 📒" style="width: 100%; margin-bottom: 0.5rem;">
@@ -744,10 +745,13 @@ let widgetData = JSON.parse(localStorage.getItem("dashboardWidgets"));
 
 if (!widgetData || widgetData.length === 0) {
   widgetData = [
+    { icon: "💰", label: "Keuangan", link: "keuangan.html" },
     { icon: "🏋️", label: "Kebugaran", link: "kebugaran.html" },
     { icon: "📋", label: "Native Daily", link: "native-daily.html" },
+    { icon: "📒", label: "Note For Day", link: "http://advogrow.page.gd/note.php" },
+    { icon: "💬", label: "Chat", link: "http://advogrow.page.gd/komentar.php" },
     { icon: "📅", label: "30 Hari Disiplin", link: "30hari.html" },
-    { icon: "📒", label: "Note For Day", link: "http://advogrow.page.gd/note.php" }
+
   ];
   localStorage.setItem("dashboardWidgets", JSON.stringify(widgetData));
 }
@@ -841,18 +845,32 @@ if (!widgetData || widgetData.length === 0) {
 </script>
 <!-- Script Motivasi -->
 <script>
-  const quotes = [
-    `"Hidup itu bukan soal menunggu badai reda, tapi belajar menari di tengah hujan." — Najwa Shihab`,
-    `"Orang bijak belajar ketika mereka bisa. Orang bodoh belajar ketika mereka harus." — Arthur Wellesley`,
-    `"Kesuksesan adalah jumlah dari usaha kecil yang diulang hari demi hari." — Robert Collier`,
-    `"Orang yang memindahkan gunung memulainya dengan membawa batu kecil." — Pepatah Cina`,
-    `"Kalau bukan kita, siapa lagi? Kalau bukan sekarang, kapan lagi?" — Bung Karno`,
-    `"Sabar itu bukan diam. Sabar adalah tindakan mengendalikan emosi dan tetap fokus pada tujuan." — Ustadz Hanan Attaki`,
-    `"Keberanian bukan tidak adanya rasa takut, tapi keputusan bahwa ada hal yang lebih penting dari rasa takut itu." — Ambrose Redmoon`,
-    `"Kesempatan tidak datang dua kali. Tapi kesungguhan membuat semua kesempatan terlihat." — Fiersa Besari`,
-    `"Jika kamu ingin cepat, pergi sendiri. Jika kamu ingin jauh, pergi bersama." — Pepatah Afrika`,
-    `"Kedisiplinan mengalahkan bakat saat bakat tidak disiplin." — Anonim`
-  ];
+  const quotes = {
+    id: [
+      `"Hidup itu bukan soal menunggu badai reda, tapi belajar menari di tengah hujan." — Najwa Shihab`,
+      `"Orang bijak belajar ketika mereka bisa. Orang bodoh belajar ketika mereka harus." — Arthur Wellesley`,
+      `"Kesuksesan adalah jumlah dari usaha kecil yang diulang hari demi hari." — Robert Collier`,
+      `"Orang yang memindahkan gunung memulainya dengan membawa batu kecil." — Pepatah Cina`,
+      `"Kalau bukan kita, siapa lagi? Kalau bukan sekarang, kapan lagi?" — Bung Karno`,
+      `"Sabar itu bukan diam. Sabar adalah tindakan mengendalikan emosi dan tetap fokus pada tujuan." — Ustadz Hanan Attaki`,
+      `"Keberanian bukan tidak adanya rasa takut, tapi keputusan bahwa ada hal yang lebih penting dari rasa takut itu." — Ambrose Redmoon`,
+      `"Kesempatan tidak datang dua kali. Tapi kesungguhan membuat semua kesempatan terlihat." — Fiersa Besari`,
+      `"Jika kamu ingin cepat, pergi sendiri. Jika kamu ingin jauh, pergi bersama." — Pepatah Afrika`,
+      `"Kedisiplinan mengalahkan bakat saat bakat tidak disiplin." — Anonim`
+    ],
+    en: [
+      `"Life isn't about waiting for the storm to pass, it's about learning to dance in the rain." — Najwa Shihab`,
+      `"Wise people learn when they can. Fools learn when they must." — Arthur Wellesley`,
+      `"Success is the sum of small efforts repeated day in and day out." — Robert Collier`,
+      `"He who moves a mountain begins by carrying away small stones." — Chinese Proverb`,
+      `"If not us, who? If not now, when?" — Soekarno`,
+      `"Patience is not about silence. It's the act of controlling emotions and staying focused on goals." — Hanan Attaki`,
+      `"Courage is not the absence of fear, but the decision that something else is more important than fear." — Ambrose Redmoon`,
+      `"Opportunities don’t come twice. But determination makes every chance visible." — Fiersa Besari`,
+      `"If you want to go fast, go alone. If you want to go far, go together." — African Proverb`,
+      `"Discipline beats talent when talent doesn’t discipline itself." — Unknown`
+    ]
+  };
 
   const gifPaths = [
     "https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyMW9raXB0dDBucmVhN2lhNm05dmF3eDg2dHVjcTlwdnNjODRvbG1kNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TMYcPzTxK73qBmeakB/giphy.gif",
@@ -867,14 +885,13 @@ if (!widgetData || widgetData.length === 0) {
     const quoteText = document.getElementById('quote');
     const videoContainer = document.getElementById('video-container');
 
-    const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
-    const randomGifIndex = Math.floor(Math.random() * gifPaths.length);
-
-    const selectedQuote = quotes[randomQuoteIndex];
-    const selectedGif = gifPaths[randomGifIndex];
+    const lang = currentLang || "id";
+    const quoteList = quotes[lang];
+    const selectedQuote = quoteList[Math.floor(Math.random() * quoteList.length)];
+    const selectedGif = gifPaths[Math.floor(Math.random() * gifPaths.length)];
 
     quoteText.innerText = selectedQuote;
-    videoContainer.innerHTML = `<img src="${selectedGif}" alt="Motivasi GIF" style="max-width: 100%; border-radius: 12px;">`;
+    videoContainer.innerHTML = `<img src="${selectedGif}" alt="Motivational GIF" style="max-width: 100%; border-radius: 12px;">`;
 
     localStorage.setItem("lastMotivasi", selectedQuote);
   }
@@ -924,7 +941,7 @@ if (!widgetData || widgetData.length === 0) {
       const iklan = iklanList[Math.floor(Math.random() * iklanList.length)];
       document.getElementById("popup-img").src = iklan.img;
       document.getElementById("popup-text").innerText = iklan.teks;
-      document.getElementById("popup-download").href = iklan.link;
+      document.getElementById("popup-download").href = "https://github.com/fdpage/growth/raw/refs/heads/main/GrowthID.apk";
 
       // Tampilkan popup dengan delay 3 detik
       setTimeout(() => {
@@ -951,7 +968,65 @@ if (!widgetData || widgetData.length === 0) {
     }
   });
 </script>
+<script>
+  const translations = {
+    id: {
+      title: "Growth App",
+      dashboard: "Dashboard For Growth",
+      searchPlaceholder: "Cari sesuatu...",
+      searchButton: "Cari",
+      themeButton: "🎨 Ganti Tema",
+      langButton: "🌐 Ganti Bahasa",
+      motivasiButton: "🎯 Dapatkan Motivasi",
+      motivasiTextDefault: "Klik tombol di bawah untuk mendapatkan motivasi hari ini.",
+      addShortcut: "➕ Tambah Pintasan",
+      saveButton: "💾 Simpan"
+    },
+    en: {
+      title: "Growth App",
+      dashboard: "Dashboard For Growth",
+      searchPlaceholder: "Search something...",
+      searchButton: "Search",
+      themeButton: "🎨 Switch Theme",
+      langButton: "🌐 Switch Language",
+      motivasiButton: "🎯 Get Motivation",
+      motivasiTextDefault: "Click the button below to get your daily motivation.",
+      addShortcut: "➕ Add Shortcut",
+      saveButton: "💾 Save"
+    }
+  };
 
+  let currentLang = localStorage.getItem("lang") || "id";
+
+  function switchLanguage() {
+    currentLang = currentLang === "id" ? "en" : "id";
+    localStorage.setItem("lang", currentLang);
+    applyLanguage();
+  }
+
+  function applyLanguage() {
+    const t = translations[currentLang];
+
+    document.title = t.title;
+    document.querySelector(".growth-title").innerText = t.title;
+    document.querySelector("h1").innerText = t.dashboard;
+    document.getElementById("search-input").placeholder = t.searchPlaceholder;
+    document.querySelector(".search-form button[type='submit']").innerText = t.searchButton;
+    document.getElementById("theme-button").innerText = t.themeButton;
+    document.getElementById("lang-button").innerText = t.langButton;
+    document.querySelector(".motivasi-container button").innerText = t.motivasiButton;
+
+    const defaultText = localStorage.getItem("lastMotivasi") ? localStorage.getItem("lastMotivasi") : t.motivasiTextDefault;
+    document.getElementById("quote").innerText = defaultText;
+
+    document.querySelector("button[onclick='toggleWidgetForm()']").innerText = t.addShortcut;
+    document.querySelector("button[onclick='saveWidget()']").innerText = t.saveButton;
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    applyLanguage();
+  });
+</script>
 <!-- Footer -->
 <footer class="footer">
   <a href="https://growthid.vercel.app/" target="_blank">Advo Grow</a> v4
