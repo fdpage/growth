@@ -234,6 +234,95 @@ button:hover {
   color: #aaffcc;
   box-shadow: 0 0 6px rgba(0,255,153,0.1);
 }
+/* 🔳 Overlay */
+.import-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 📦 Box utama */
+.import-box {
+  background: linear-gradient(135deg, #1b1f1d, #26332d);
+  border-radius: 20px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 20px rgba(0, 255, 153, 0.2);
+  color: #e0ffe1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  text-align: center;
+}
+
+/* Judul */
+.import-box h3 {
+  margin: 0;
+  color: #00ff99;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Textarea */
+#importTextarea {
+  width: 100%;
+  height: 200px;
+  background: #111;
+  border: 1px solid #00ff99;
+  border-radius: 12px;
+  color: #aaffcc;
+  font-size: 15px;
+  padding: 12px;
+  resize: vertical;
+  box-shadow: inset 0 2px 6px rgba(0,255,153,0.08);
+}
+
+/* Container tombol */
+.import-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Tombol */
+.import-actions button {
+  flex: 1; /* sama lebar */
+  background-color: #00ff99;
+  color: #000;
+  border: none;
+  padding: 12px 0;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 255, 153, 0.2);
+}
+
+.import-actions button:hover {
+  background-color: #00e68a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,255,153,0.3);
+}
+
+/* Tombol batal */
+.import-actions .cancel-btn {
+  background-color: #222;
+  color: #aaffcc;
+  border: 1px solid #00ff99;
+}
+
+.import-actions .cancel-btn:hover {
+  background-color: #333;
+}
   </style>
 </head>
 <body>
@@ -596,24 +685,33 @@ function copyData() {
 }
 
 function pasteData() {
-  const input = prompt("📥 Tempel data hasil copy sebelumnya di sini:");
+  const overlay = document.createElement("div");
+  overlay.className = "import-overlay";
 
-  if (!input) {
-    alert("❌ Tidak ada data yang ditempel.");
-    return;
-  }
+  overlay.innerHTML = `
+    <div class="import-box">
+      <h3>📥 Import Data JSON</h3>
+      <textarea id="importTextarea" placeholder="Tempel data hasil copy di sini..."></textarea>
+      <div class="import-actions">
+        <button onclick="applyPastedData()">Simpan</button>
+        <button class="cancel-btn" onclick="this.closest('.import-overlay').remove()">Batal</button>
+      </div>
+    </div>
+  `;
 
+  document.body.appendChild(overlay);
+}
+
+function applyPastedData() {
+  const teks = document.getElementById("importTextarea").value.trim();
+  if (!teks) return alert("❌ Tidak ada data yang ditempel.");
   try {
-    const parsed = JSON.parse(input);
-    if (parsed && typeof parsed === "object") {
-      localStorage.setItem("nativeDailyFullData", JSON.stringify(parsed));
-      alert("✅ Data berhasil dipulihkan!");
-      location.reload();
-    } else {
-      alert("❌ Format data tidak valid!");
-    }
+    const parsed = JSON.parse(teks);
+    localStorage.setItem("nativeDailyFullData", JSON.stringify(parsed));
+    alert("✅ Data berhasil dipulihkan!");
+    location.reload();
   } catch (e) {
-    alert("❌ Gagal memproses data! Pastikan data valid JSON.");
+    alert("❌ Data tidak valid!\n" + e.message);
   }
 }
 </script>
