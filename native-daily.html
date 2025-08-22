@@ -323,6 +323,18 @@ button:hover {
 .import-actions .cancel-btn:hover {
   background-color: #333;
 }
+/* Status warna */
+.status-green { background-color: #004d33; color: #00ff99; }
+.status-yellow { background-color: #665c00; color: #fff066; }
+.status-red { background-color: #660000; color: #ff6666; }
+.progress-status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+.progress-green { background-color: #004d33; color: #00ff99; }
+.progress-yellow { background-color: #665c00; color: #fff066; }
+.progress-red { background-color: #660000; color: #ff6666; }
   </style>
 </head>
 <body>
@@ -343,6 +355,21 @@ button:hover {
     <h3>Total Poin: <span id="totalPoint">0</span></h3>
     <h3>Rank: <span id="userRank">🌱 Pemula</span></h3>
     <p id="motivasi">“Langkah kecil hari ini adalah awal dari kemenangan besar besok.”</p>
+  </div>
+
+</div>
+<div class="status-card">
+  <div class="status-info" style="margin-top:1rem;">
+    <h3>Indikator Perkembangan</h3>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div>1 Hari: <span id="dailyProgress" class="progress-status">-</span></div>
+      <div>1 Minggu: <span id="weeklyProgress" class="progress-status">-</span></div>
+      <div>1 Bulan: <span id="monthlyProgress" class="progress-status">-</span></div>
+    </div>
+  </div>
+  <div class="status-info">
+    <h3>Rata-rata Skor: <span id="avgScore">0</span></h3>
+    <h3>Status: <span id="statusLevel" style="padding:4px 10px;border-radius:6px;">-</span></h3>
   </div>
 </div>
   <div class="btn-container">
@@ -522,6 +549,7 @@ data.dailyData.push({ tanggal: hariIni, skor, selesai: selesaiList });
     data.totalPoint = total;
 
     saveFullData(data);
+updateProgressIndicators();
 
     tampilkanGrafik(data.dailyData);
     hitungTotalPoin();
@@ -534,7 +562,11 @@ daftarKegiatan.forEach((_, i) => {
   const checkbox = document.getElementById(`kegiatan-${i}`);
   if (checkbox) checkbox.checked = false;
 });
+   hitungRataRata();
   }
+  
+  hitungRataRata();
+  updateProgressIndicators();
 
   function tampilkanGrafik(data) {
     const ctx = document.getElementById('progressChart').getContext('2d');
@@ -574,7 +606,7 @@ daftarKegiatan.forEach((_, i) => {
     document.getElementById("totalPoint").textContent = total;
     tampilkanRank(total);
   }
-
+updateProgressIndicators();
   function tampilkanRank(totalPoin) {
   const ranks = [
     { min: 0, rank: "🌱 Pemula", motivasi: "“Langkah kecil hari ini adalah awal dari kemenangan besar besok.” – Unknown" },
@@ -714,6 +746,85 @@ function applyPastedData() {
     alert("❌ Data tidak valid!\n" + e.message);
   }
 }
+function hitungRataRata() {
+  const data = getFullData();
+  if (!data.dailyData || data.dailyData.length === 0) {
+    document.getElementById("avgScore").textContent = 0;
+    updateStatusLevel(0);
+    return;
+  }
+
+  const totalSkor = data.dailyData.reduce((sum, entry) => sum + entry.skor, 0);
+  const rata = totalSkor / data.dailyData.length;
+
+  // Simpan ke localStorage
+  data.avgScore = rata;
+  saveFullData(data);
+
+  document.getElementById("avgScore").textContent = rata.toFixed(1);
+  updateStatusLevel(rata);
+}
+
+function updateStatusLevel(avg) {
+  const statusEl = document.getElementById("statusLevel");
+  statusEl.className = ""; // reset
+
+  let statusText = "";
+  if (avg >= daftarKegiatan.length * 0.7) {
+    statusText = "Bagus";
+    statusEl.classList.add("status-green");
+  } else if (avg >= daftarKegiatan.length * 0.4) {
+    statusText = "Sedang";
+    statusEl.classList.add("status-yellow");
+  } else {
+    statusText = "Buruk";
+    statusEl.classList.add("status-red");
+  }
+
+  statusEl.textContent = statusText;
+}
+function updateProgressIndicators() {
+  const data = getFullData();
+  const now = new Date();
+  const oneDay = 24 * 60 * 60 * 1000;
+
+  // Helper: hitung rata-rata skor dalam N hari terakhir
+  function avgInDays(days) {
+    const cutoff = new Date(now - oneDay * days);
+    const filtered = data.dailyData.filter(entry => new Date(entry.tanggal) >= cutoff);
+    if (filtered.length === 0) return null;
+    const totalSkor = filtered.reduce((sum, e) => sum + e.skor, 0);
+    return (totalSkor / (filtered.length * daftarKegiatan.length)) * 100;
+  }
+
+  const daily = avgInDays(1);
+  const weekly = avgInDays(7);
+  const monthly = avgInDays(30);
+
+  function setStatus(id, val) {
+    const el = document.getElementById(id);
+    el.className = "progress-status"; // reset
+    if (val === null) {
+      el.textContent = "Belum ada data";
+      return;
+    }
+    el.textContent = val.toFixed(1) + "%";
+    if (val >= 70) el.classList.add("progress-green");
+    else if (val >= 40) el.classList.add("progress-yellow");
+    else el.classList.add("progress-red");
+  }
+
+  setStatus("dailyProgress", daily);
+  setStatus("weeklyProgress", weekly);
+  setStatus("monthlyProgress", monthly);
+
+  // Simpan ke LocalStorage
+  data.progressStats = { daily, weekly, monthly };
+  saveFullData(data);
+}
+
+// Panggil saat inisialisasi
+updateProgressIndicators();
 </script>
 </body>
   </html>
