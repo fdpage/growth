@@ -48,34 +48,6 @@
       color: #fff;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      background-color: #0f2a1f;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th, td {
-      border: 1px solid #1f4c3a;
-      padding: 10px;
-      text-align: center;
-    }
-
-    th {
-      background-color: #00ff99;
-      color: #000;
-    }
-
-    tr:nth-child(even) {
-      background-color: #123526;
-    }
-
-    tr:nth-child(odd) {
-      background-color: #194633;
-    }
-
     .top-buttons, .bottom-buttons {
       display: flex;
       gap: 10px;
@@ -104,12 +76,88 @@
       margin-top: 1rem;
       border: 1px solid #1f4c3a;
     }
+
+    /* Pop-up modal */
+ .modal {
+  display: none; /* Awalnya tetap tersembunyi */
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+  opacity: 0;              /* Tambahkan efek transparansi */
+  transition: opacity 0.3s ease; /* Animasi saat muncul */
+}
+
+.modal.show {
+  display: flex;           /* Muncul sebagai flex */
+  opacity: 1;              /* Jadi terlihat */
+}
+
+.modal-content {
+  background: #0f2a1f;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  color: #fff;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(-20px); /* Awal posisi agak ke atas */
+  transition: transform 0.3s ease;
+}
+
+.modal.show .modal-content {
+  transform: translateY(0); /* Turun ke posisi normal */
+}
+
+    .modal-content {
+      background: #0f2a1f;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      color: #fff;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .close-btn {
+      background: #cc0000;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      float: right;
+      cursor: pointer;
+    }
+
+    .copy-paste-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    textarea.copy-area {
+      height: 100px;
+      resize: none;
+      background: #123526;
+      color: #fff;
+    }
+  #historyList {
+    max-height: 300px; /* Batasi tinggi agar scroll aktif */
+    overflow-y: auto;
+    padding-right: 5px;
+  }
   </style>
 </head>
 <body>
 
   <div class="top-buttons">
     <button class="danger" onclick="hapusSemuaData()">🗑️ Hapus Semua Data</button>
+    <button onclick="bukaHistory()">📜 Lihat History</button>
   </div>
 
   <h1>📈 Tracking Progress Otot</h1>
@@ -127,18 +175,11 @@
   <textarea id="latihan" rows="3" placeholder="Contoh: Push, Pull, Legs..."></textarea>
 
   <button onclick="simpanTracking()">💾 Simpan Progress</button>
+  <p>
+  <button onclick="bukaBackup()">📋 Backup Data</button>
+  </div>
+  </p>
 
-  <table id="tabelTracking" style="display:none">
-    <thead>
-      <tr>
-        <th>Tanggal</th>
-        <th>Berat (kg)</th>
-        <th>Lingkar Otot (cm)</th>
-        <th>Latihan</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 
   <h2>🍽️ Panduan Nutrisi & Suplemen</h2>
   <label for="tujuan">Tujuan:</label>
@@ -156,6 +197,27 @@
     <button class="btn-back" onclick="window.history.back()">🏋 Kembali ke Kebugaran</button>
   </div>
 
+  <!-- Modal History -->
+  <div id="modalHistory" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="tutupHistory()">Tutup</button>
+      <h2>Riwayat Progress</h2>
+      <div id="historyList"></div>
+    </div>
+  </div>
+  
+    <div id="modalBackup" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="tutupBackup()">Tutup</button>
+
+      <div class="copy-paste-container">
+        <button onclick="copyData()">📋 Copy Data</button>
+        <textarea id="pasteArea" class="copy-area" placeholder="Paste data di sini untuk impor..."></textarea>
+        <button onclick="pasteData()">📥 Paste Data</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const keyTracking = "progresOtot";
 
@@ -163,47 +225,81 @@
       return JSON.parse(localStorage.getItem(keyTracking)) || [];
     }
 
-    function simpanTracking() {
-      const tanggal = document.getElementById("tanggal").value;
-      const berat = document.getElementById("berat").value;
-      const otot = document.getElementById("otot").value;
-      const latihan = document.getElementById("latihan").value;
+function simpanTracking() {
+  const tanggal = document.getElementById("tanggal").value;
+  const berat = document.getElementById("berat").value;
+  const otot = document.getElementById("otot").value;
+  const latihan = document.getElementById("latihan").value;
 
-      if (!tanggal || !berat || !otot) {
-        alert("Isi semua data terlebih dahulu!");
-        return;
-      }
+  if (!tanggal || !berat || !otot) {
+    alert("Isi semua data terlebih dahulu!");
+    return;
+  }
 
-      const data = ambilTracking();
-      data.push({ tanggal, berat, otot, latihan });
-      localStorage.setItem(keyTracking, JSON.stringify(data));
+  const data = ambilTracking();
+  data.push({ tanggal, berat, otot, latihan });
+  localStorage.setItem(keyTracking, JSON.stringify(data));
 
-      tampilkanTracking();
+  kosongkanInput();
+
+  // Tambahkan ini agar history diperbarui otomatis
+  perbaruiHistory();
+}
+
+// Fungsi untuk update history di modal tanpa buka modal dulu
+function perbaruiHistory() {
+  const data = ambilTracking();
+  const historyDiv = document.getElementById("historyList");
+  if (!historyDiv) return;
+  historyDiv.innerHTML = "";
+
+  if (data.length === 0) {
+    historyDiv.innerHTML = "<p>Belum ada data tersimpan.</p>";
+  } else {
+    // Urutkan dari terbaru ke terlama
+    const sortedData = [...data].reverse();
+    sortedData.forEach(d => {
+      historyDiv.innerHTML += `
+        <div style="margin-bottom:10px; border-bottom:1px solid #1f4c3a; padding-bottom:8px;">
+          <strong>${d.tanggal}</strong><br>
+          Berat: ${d.berat} kg<br>
+          Lingkar Otot: ${d.otot} cm<br>
+          Latihan: ${d.latihan || "-"}
+        </div>
+      `;
+    });
+  }
+}
+
+    function kosongkanInput() {
       document.getElementById("tanggal").value = '';
       document.getElementById("berat").value = '';
       document.getElementById("otot").value = '';
       document.getElementById("latihan").value = '';
     }
 
-    function tampilkanTracking() {
-      const data = ambilTracking();
-      const tbody = document.querySelector("#tabelTracking tbody");
-      tbody.innerHTML = "";
+function bukaHistory() {
+  perbaruiHistory(); // Selalu perbarui sebelum dibuka
+  const modal = document.getElementById("modalHistory");
+  modal.style.display = "flex";
+  setTimeout(() => modal.classList.add("show"), 10);
+}
+function tutupHistory() {
+  const modal = document.getElementById("modalHistory");
+  modal.classList.remove("show");
+  setTimeout(() => modal.style.display = "none", 300); // Tunggu animasi selesai
+}
 
-      data.forEach(d => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${d.tanggal}</td>
-            <td>${d.berat}</td>
-            <td>${d.otot}</td>
-            <td>${d.latihan}</td>
-          </tr>
-        `;
-      });
-
-      document.getElementById("tabelTracking").style.display = data.length > 0 ? "table" : "none";
+function bukaBackup() {
+  perbaruiHistory(); // Selalu perbarui sebelum dibuka
+  const modal = document.getElementById("modalBackup");
+  modal.style.display = "flex";
+  setTimeout(() => modal.classList.add("show"), 10);
+}
+function tutupBackup() {
+      document.getElementById("modalBackup").style.display = "none";
     }
-
+    
     function tampilkanPanduan() {
       const tujuan = document.getElementById("tujuan").value;
       const panduan = {
@@ -233,12 +329,30 @@
     function hapusSemuaData() {
       if (confirm("Apakah kamu yakin ingin menghapus semua data tracking?")) {
         localStorage.removeItem(keyTracking);
-        tampilkanTracking();
       }
     }
 
-    // Load data saat halaman dibuka
-    window.onload = tampilkanTracking;
+    function copyData() {
+      const data = localStorage.getItem(keyTracking) || "[]";
+      navigator.clipboard.writeText(data);
+      alert("Data berhasil dicopy!");
+    }
+
+    function pasteData() {
+      const pasteArea = document.getElementById("pasteArea").value;
+      try {
+        const parsed = JSON.parse(pasteArea);
+        if (Array.isArray(parsed)) {
+          localStorage.setItem(keyTracking, JSON.stringify(parsed));
+          alert("Data berhasil diimpor!");
+          tutupHistory();
+        } else {
+          alert("Format data tidak valid!");
+        }
+      } catch (e) {
+        alert("Data tidak valid! Harus format JSON.");
+      }
+    }
   </script>
 
 </body>
