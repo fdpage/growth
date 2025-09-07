@@ -1,1 +1,387 @@
-<!doctypehtml><html lang=id><meta charset=UTF-8><meta content="width=device-width,initial-scale=1"name=viewport><title>Native Daily Tracker</title><script defer src=https://cdn.jsdelivr.net/npm/chart.js></script><script defer src=script.js></script><link rel="stylesheet" href="styles.css"><a class=btn-back href=index.html>⬅️ Kembali</a><h1>✅ Native Daily Tracker</h1><div class=status-card><div id=chartContainer><p id=chartWarning style=text-align:center;color:#ccc;font-style:italic>📉 Belum ada data skor untuk ditampilkan. Simpan aktivitas harian untuk melihat grafik!</p><canvas height=300 id=progressChart></canvas></div><div class=status-info><h3><span id=userAvatar style=cursor:pointer contenteditable=true>👤</span> <span id=userName style=cursor:text contenteditable=true>Klik untuk edit nama</span></h3><h3>Total Poin: <span id=totalPoint>0</span></h3><h3>Rank: <span id=userRank>🌱 Pemula</span></h3><p id=motivasi>“Langkah kecil hari ini adalah awal dari kemenangan besar besok.”</div></div><div class=status-card><div class=status-info style=margin-top:1rem><h3>Indikator Perkembangan</h3><div style=display:flex;flex-direction:column;gap:6px><div>1 Hari: <span id=dailyProgress class=progress-status>-</span></div><div>1 Minggu: <span id=weeklyProgress class=progress-status>-</span></div><div>1 Bulan: <span id=monthlyProgress class=progress-status>-</span></div></div></div><div class=status-info><h3>Rata-rata Skor: <span id=avgScore>0</span></h3><h3>Status: <span id=statusLevel style="padding:4px 10px;border-radius:6px">-</span></h3></div></div><div class=btn-container><button onclick=bukaPopupEdit()>✏️ Edit To-Do List</button> <button onclick=bukaPopupHistory()>📜 Lihat Riwayat</button></div><div class=modal-overlay id=popupEdit><div class=modal-box><h3>📝 Edit To-Do List (1 per baris)</h3><textarea id=editableTasks></textarea><div class=btn-container><button onclick=simpanDanTutup()>💾 Simpan & Tutup</button></div></div></div><div class=modal-overlay id=popupHistory><div class=modal-box><h3>📅 Riwayat Aktivitas</h3><div id=historyContent style=max-height:300px;overflow-y:auto;margin-top:10px></div><div class=btn-container><button onclick=tutupPopupHistory()>Tutup</button></div></div></div><div class=btn-container><button onclick=simpanData()>💾 Simpan Hari Ini</button> <button onclick=hapusSemua()>🗑️ Hapus Semua Data</button></div><table id=todoTable><thead><tr><th>Kegiatan<th>Status<tbody></table><div class=btn-container><button onclick=copyData()>📋 Copy Data</button> <button onclick=pasteData()>📥 Paste Data</button></div>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard For Growth</title>
+ <!-- Link ke file CSS eksternal -->
+  <link rel="stylesheet" href="homestyles.css">
+</head>
+<body class="theme-hutan">
+<div id="popup-iklan" style="display:none;">
+  <div class="popup-overlay"></div>
+  <div class="popup-content">
+    <button class="popup-close" onclick="hidePopup()">✕</button>
+    <img id="popup-img" src="" alt="Iklan" class="popup-image">
+    <p id="popup-text" class="popup-text"></p>
+    <a id="popup-download" class="popup-download" href="#" target="_blank">⬇️ Download Sekarang</a>
+    <button onclick="closePopupPermanen()" class="popup-button">Jangan tampilkan lagi</button>
+  </div>
+</div>
+
+  <div class="growth-title">Growth App</div>
+  <div class="motivasi-kasar">
+    <p><span class="highlight-poor">Success Is A Journey</span>, <span class="highlight-rich">Not A Destination</span></p>
+    <p><span class="highlight-no">No Testosteron</span>, <span class="highlight-transformation">No Transformation</span></p>
+</div>
+  <form onsubmit="handleSearch(event)" class="search-form">
+  <div class="form-row">
+    <input id="search-input" type="text" placeholder="Cari sesuatu..." required />
+    <div class="form-actions">
+      <select id="search-engine">
+        <option value="google">🔍 Google</option>
+        <option value="youtube">📺 YouTube</option>
+        <option value="ecosia">🌱 Ecosia</option>
+        <option value="wikipedia">📚 Wikipedia</option>
+      </select>
+      <button type="submit">Cari</button>
+    </div>
+  </div>
+</form>
+
+  <h1>Dashboard For Growth</h1>
+<div class="grid" id="widget-grid"></div>
+<!-- Tombol + Tambah Widget -->
+<button onclick="toggleWidgetForm()">➕ Tambah Pintasan</button>
+<!-- Tombol Ganti Tema -->
+<button onclick="switchTheme()" id="theme-button" style="margin-top: 1rem;">🎨 Ganti Tema</button>
+<!-- Tombol Ganti Bahasa -->
+<button onclick="switchLanguage()" id="lang-button" style="margin-top: 0.5rem;">🌐 Ganti Bahasa</button>
+<!-- Form Input Tambah/Edit -->
+<div id="widget-form" style="display:none; margin-top:1rem; max-width:600px; width:100%;">
+  <input type="text" id="widget-icon" placeholder="Emoji/Icon misalnya 📒" style="width: 100%; margin-bottom: 0.5rem;">
+  <input type="text" id="widget-label" placeholder="Label misalnya 'Catatan Harian'" style="width: 100%; margin-bottom: 0.5rem;">
+  <input type="text" id="widget-link" placeholder="Link halaman misalnya note.html" style="width: 100%; margin-bottom: 0.5rem;">
+  <button onclick="saveWidget()">💾 Simpan</button>
+</div>
+
+ <!-- Tambahan dalam tag <body> -->
+
+<div class="motivasi-container">
+  <div id="quote">Klik tombol di bawah untuk mendapatkan motivasi hari ini.</div>
+  <div id="video-container" style="margin-top: 1.5rem;"></div>
+  <button onclick="getMotivasi()">🎯 Dapatkan Motivasi</button>
+</div>
+
+
+<!-- Tema -->
+<script>
+  const themes = ["theme-hutan", "theme-langit", "theme-senja", "theme-malam"];
+  let currentThemeIndex = 0;
+
+  function switchTheme() {
+    // Hapus tema lama
+    document.body.classList.remove(...themes);
+
+    // Ganti ke tema berikutnya
+    currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+    const newTheme = themes[currentThemeIndex];
+    document.body.classList.add(newTheme);
+    localStorage.setItem("preferredTheme", newTheme);
+  }
+
+  // Set tema awal saat halaman dibuka
+  window.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("preferredTheme");
+    if (savedTheme && themes.includes(savedTheme)) {
+      document.body.classList.remove(...themes);
+      document.body.classList.add(savedTheme);
+      currentThemeIndex = themes.indexOf(savedTheme);
+    }
+  });
+</script>
+<!-- Widget --->
+<script>
+let widgetData = JSON.parse(localStorage.getItem("dashboardWidgets"));
+
+if (!widgetData || widgetData.length === 0) {
+  widgetData = [
+    { icon: "💰", label: "Keuangan", link: "keuangan.html" },
+    { icon: "🏋️", label: "Kebugaran", link: "kebugaran.html" },
+    { icon: "📋", label: "Native Daily", link: "native-daily.html" },
+    { icon: "📒", label: "Note For Day", link: "http://advogrow.page.gd/note.php" },
+    { icon: "💬", label: "Chat", link: "http://advogrow.page.gd/komentar.php" },
+    { icon: "📅", label: "30 Hari Disiplin", link: "30hari.html" },
+
+  ];
+  localStorage.setItem("dashboardWidgets", JSON.stringify(widgetData));
+}
+
+  window.onload = function () {
+    // Jalankan fungsi render widget
+    renderWidgets();
+
+    // Tampilkan kutipan terakhir jika ada
+    const last = localStorage.getItem("lastMotivasi");
+    if (last) {
+      document.getElementById('quote').innerText = last;
+    }
+  };
+
+  const widgetGrid = document.getElementById("widget-grid");
+  const widgetForm = document.getElementById("widget-form");
+  const iconInput = document.getElementById("widget-icon");
+  const labelInput = document.getElementById("widget-label");
+  const linkInput = document.getElementById("widget-link");
+
+  let editWidgetIndex = null;
+
+  function renderWidgets() {
+    widgetGrid.innerHTML = "";
+    widgetData.forEach((widget, index) => {
+      const card = document.createElement("div");
+      card.className = "box";
+      card.innerHTML = `
+        <a href="${widget.link}" style="color:inherit; text-decoration:none;">
+          <div class="icon">${widget.icon}</div>
+          <div>${widget.label}</div>
+        </a>
+        <div style="margin-top: 0.5rem;">
+          <button onclick="editWidget(${index})" style="font-size:0.8rem;">✏️</button>
+          <button onclick="deleteWidget(${index})" style="font-size:0.8rem;">🗑️</button>
+        </div>
+      `;
+      widgetGrid.appendChild(card);
+    });
+  }
+
+  function toggleWidgetForm() {
+    widgetForm.style.display = widgetForm.style.display === "none" ? "block" : "none";
+    iconInput.value = "";
+    labelInput.value = "";
+    linkInput.value = "";
+    editWidgetIndex = null;
+  }
+
+  function saveWidget() {
+    const icon = iconInput.value.trim();
+    const label = labelInput.value.trim();
+    const link = linkInput.value.trim();
+
+    if (!icon || !label || !link) {
+      alert("Semua kolom harus diisi.");
+      return;
+    }
+
+    const widget = { icon, label, link };
+
+    if (editWidgetIndex !== null) {
+      widgetData[editWidgetIndex] = widget;
+    } else {
+      widgetData.push(widget);
+    }
+
+    localStorage.setItem("dashboardWidgets", JSON.stringify(widgetData));
+    renderWidgets();
+    toggleWidgetForm();
+  }
+
+  function editWidget(index) {
+    const widget = widgetData[index];
+    iconInput.value = widget.icon;
+    labelInput.value = widget.label;
+    linkInput.value = widget.link;
+    editWidgetIndex = index;
+    widgetForm.style.display = "block";
+  }
+
+  function deleteWidget(index) {
+    if (confirm("Hapus widget ini?")) {
+      widgetData.splice(index, 1);
+      localStorage.setItem("dashboardWidgets", JSON.stringify(widgetData));
+      renderWidgets();
+    }
+  }
+
+</script>
+<!-- Script Motivasi -->
+<script>
+  const quotes = {
+    id: [
+      `"Hidup itu bukan soal menunggu badai reda, tapi belajar menari di tengah hujan." — Najwa Shihab`,
+      `"Orang bijak belajar ketika mereka bisa. Orang bodoh belajar ketika mereka harus." — Arthur Wellesley`,
+      `"Kesuksesan adalah jumlah dari usaha kecil yang diulang hari demi hari." — Robert Collier`,
+      `"Orang yang memindahkan gunung memulainya dengan membawa batu kecil." — Pepatah Cina`,
+      `"Kalau bukan kita, siapa lagi? Kalau bukan sekarang, kapan lagi?" — Bung Karno`,
+      `"Sabar itu bukan diam. Sabar adalah tindakan mengendalikan emosi dan tetap fokus pada tujuan." — Ustadz Hanan Attaki`,
+      `"Keberanian bukan tidak adanya rasa takut, tapi keputusan bahwa ada hal yang lebih penting dari rasa takut itu." — Ambrose Redmoon`,
+      `"Kesempatan tidak datang dua kali. Tapi kesungguhan membuat semua kesempatan terlihat." — Fiersa Besari`,
+      `"Jika kamu ingin cepat, pergi sendiri. Jika kamu ingin jauh, pergi bersama." — Pepatah Afrika`,
+      `"Kedisiplinan mengalahkan bakat saat bakat tidak disiplin." — Anonim`
+    ],
+    en: [
+      `"Life isn't about waiting for the storm to pass, it's about learning to dance in the rain." — Najwa Shihab`,
+      `"Wise people learn when they can. Fools learn when they must." — Arthur Wellesley`,
+      `"Success is the sum of small efforts repeated day in and day out." — Robert Collier`,
+      `"He who moves a mountain begins by carrying away small stones." — Chinese Proverb`,
+      `"If not us, who? If not now, when?" — Soekarno`,
+      `"Patience is not about silence. It's the act of controlling emotions and staying focused on goals." — Hanan Attaki`,
+      `"Courage is not the absence of fear, but the decision that something else is more important than fear." — Ambrose Redmoon`,
+      `"Opportunities don’t come twice. But determination makes every chance visible." — Fiersa Besari`,
+      `"If you want to go fast, go alone. If you want to go far, go together." — African Proverb`,
+      `"Discipline beats talent when talent doesn’t discipline itself." — Unknown`
+    ]
+  };
+
+  const gifPaths = [
+    "https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyMW9raXB0dDBucmVhN2lhNm05dmF3eDg2dHVjcTlwdnNjODRvbG1kNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TMYcPzTxK73qBmeakB/giphy.gif",
+    "https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyMHMyc3psNnlhbjd2c25sdmRxMGcyMjgyYjR0dW5pc3g3NnAwbzRtNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/LV0l74tVmsOU8/giphy.gif",
+    "https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyaHJoY2x2MjF6enVxYTBpb3h4MXVzNmxpYnh0djk3djR1MDd0MmptMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DyQrKMpqkAhNHZ1iWe/giphy.gif",
+    "https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyczloOThlZms4bWpyMDRqb3BmbHBncW40NmN2ZmhvaGg0b2YxNmh1dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8mjWvAEG5GsJY0934A/giphy.gif",
+    "https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyNGtyamJoandsOGkxc3pzb2VmaHk2NHg5YWhtYXgxbm1mbG14MDYzZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eODLcLD0Hcx7W/giphy.gif",
+    "https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyaXU2ZDg2NDE3NXNheDNxOXJ6emE1dGpqZmxqdHRnbDN2N3pjcnIxaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/nkff3KmdbVKmI/giphy.gif"
+  ];
+
+  function getMotivasi() {
+    const quoteText = document.getElementById('quote');
+    const videoContainer = document.getElementById('video-container');
+
+    const lang = currentLang || "id";
+    const quoteList = quotes[lang];
+    const selectedQuote = quoteList[Math.floor(Math.random() * quoteList.length)];
+    const selectedGif = gifPaths[Math.floor(Math.random() * gifPaths.length)];
+
+    quoteText.innerText = selectedQuote;
+    videoContainer.innerHTML = `<img src="${selectedGif}" alt="Motivational GIF" style="max-width: 100%; border-radius: 12px;">`;
+
+    localStorage.setItem("lastMotivasi", selectedQuote);
+  }
+</script>
+<!-- Script -->
+<script>
+  function handleSearch(event) {
+    event.preventDefault();
+    const query = document.getElementById('search-input').value.trim();
+    const engine = document.getElementById('search-engine').value;
+    let url = '';
+
+    switch (engine) {
+      case 'google':
+        url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        break;
+      case 'youtube':
+        url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+        break;
+      case 'ecosia':
+        url = `https://www.ecosia.org/search?q=${encodeURIComponent(query)}`;
+        break;
+      case 'wikipedia':
+        url = `https://id.wikipedia.org/wiki/${encodeURIComponent(query)}`;
+        break;
+    }
+
+    window.open(url, '_blank');
+  }
+</script>
+<!--Iklan -->
+<script>
+  const iklanList = [
+    {
+      img: "iklanapp.gif",
+      teks: "🚀 Mulai hidup disiplin dan produktif bersama Growth App!",
+      link: "#"
+    }
+  ];
+
+  function showPopupIfNeeded() {
+    const lastClosed = localStorage.getItem("popupTerakhirDitutup");
+    const now = new Date().getTime();
+
+    // Jika belum pernah ditutup atau sudah lewat 1 jam (3600000 ms)
+    if (!lastClosed || now - parseInt(lastClosed) > 300000) {
+      const iklan = iklanList[Math.floor(Math.random() * iklanList.length)];
+      document.getElementById("popup-img").src = iklan.img;
+      document.getElementById("popup-text").innerText = iklan.teks;
+      document.getElementById("popup-download").href = "https://github.com/fdpage/growth/raw/refs/heads/main/GrowthID.apk";
+
+      // Tampilkan popup dengan delay 3 detik
+      setTimeout(() => {
+        document.getElementById("popup-iklan").style.display = "flex";
+      }, 1000);
+    }
+  }
+
+  function hidePopup() {
+    localStorage.setItem("popupTerakhirDitutup", new Date().getTime().toString());
+    document.getElementById("popup-iklan").style.display = "none";
+  }
+
+  function closePopupPermanen() {
+    // Tampilkan iklan tidak akan pernah lagi
+    localStorage.setItem("popupTertutup", "true");
+    document.getElementById("popup-iklan").style.display = "none";
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const permanen = localStorage.getItem("popupTertutup");
+    if (!permanen) {
+      showPopupIfNeeded();
+    }
+  });
+</script>
+<script>
+  const translations = {
+    id: {
+      title: "Growth App",
+      dashboard: "Dashboard For Growth",
+      searchPlaceholder: "Cari sesuatu...",
+      searchButton: "Cari",
+      themeButton: "🎨 Ganti Tema",
+      langButton: "🌐 Ganti Bahasa",
+      motivasiButton: "🎯 Dapatkan Motivasi",
+      motivasiTextDefault: "Klik tombol di bawah untuk mendapatkan motivasi hari ini.",
+      addShortcut: "➕ Tambah Pintasan",
+      saveButton: "💾 Simpan"
+    },
+    en: {
+      title: "Growth App",
+      dashboard: "Dashboard For Growth",
+      searchPlaceholder: "Search something...",
+      searchButton: "Search",
+      themeButton: "🎨 Switch Theme",
+      langButton: "🌐 Switch Language",
+      motivasiButton: "🎯 Get Motivation",
+      motivasiTextDefault: "Click the button below to get your daily motivation.",
+      addShortcut: "➕ Add Shortcut",
+      saveButton: "💾 Save"
+    }
+  };
+
+  let currentLang = localStorage.getItem("lang") || "id";
+
+  function switchLanguage() {
+    currentLang = currentLang === "id" ? "en" : "id";
+    localStorage.setItem("lang", currentLang);
+    applyLanguage();
+  }
+
+  function applyLanguage() {
+    const t = translations[currentLang];
+
+    document.title = t.title;
+    document.querySelector(".growth-title").innerText = t.title;
+    document.querySelector("h1").innerText = t.dashboard;
+    document.getElementById("search-input").placeholder = t.searchPlaceholder;
+    document.querySelector(".search-form button[type='submit']").innerText = t.searchButton;
+    document.getElementById("theme-button").innerText = t.themeButton;
+    document.getElementById("lang-button").innerText = t.langButton;
+    document.querySelector(".motivasi-container button").innerText = t.motivasiButton;
+
+    const defaultText = localStorage.getItem("lastMotivasi") ? localStorage.getItem("lastMotivasi") : t.motivasiTextDefault;
+    document.getElementById("quote").innerText = defaultText;
+
+    document.querySelector("button[onclick='toggleWidgetForm()']").innerText = t.addShortcut;
+    document.querySelector("button[onclick='saveWidget()']").innerText = t.saveButton;
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    applyLanguage();
+  });
+</script>
+<!-- Footer -->
+<footer class="footer">
+  <a href="https://growthid.vercel.app/" target="_blank">Advo Grow</a> v4
+</footer>
+</body>
+</html>
